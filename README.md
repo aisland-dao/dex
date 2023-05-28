@@ -13,6 +13,11 @@ Copy in  /usr/src/dex the repo and execute:
 - npm install  
 - customisation of the files .sh
 - configure the Nginx reverse proxy to reach port tcp/3000
+- create database with:   
+mysql   
+create database dex;  
+- create tables with:
+mysql dex <create_tables.sql  
 
 ## Run
 Execute:  
