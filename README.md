@@ -26,6 +26,13 @@ Execute:
 
 to let it work in background, use systemctl
 
+TODO:
+- Show errors from the backend engine
+- Allow to change the blockchain 
+- check balance of the token before swapping
+- improve tokens ranking by additional data like market cap.
+
+
 
 
 
