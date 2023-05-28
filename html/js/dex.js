@@ -35,20 +35,36 @@ async  function  connect() {
 async function listAvailableTokens(){
   console.log("initializing");
   let response = await fetch('https://dex.aisland.io/tokens');
-  let tokens = await response.json();
-  console.log("tokens:", tokens);
-
+  tokens = await response.json();
+  await filterTokens("");
+  
+}
+// function to show the tokens filtered by string
+async function filterTokens(){
+  //console.log("FilterTokens", document.getElementById("search_token").value);
   // Create a token list for the modal
   let parent = document.getElementById("token_list");
+  // clean the previous children
+  while (parent.hasChildNodes())
+    parent.removeChild(parent.firstChild);
   // Loop through all the tokens inside the token list JSON object
+  let s=document.getElementById("search_token").value;
   for (const i in tokens){
+    // filter
+    if(s.length>0){
+      const ss=tokens[i].symbol.toUpperCase();
+      const sn=tokens[i].name.toUpperCase();
+      const search=s.toUpperCase();
+      if(ss.includes(search)==false && sn.includes(search)==false)
+        continue;
+    }    
     // Create a row for each token in the list
     let div = document.createElement("div");
     div.className = "token_row";
     // For each row, display the token image and symbol
     let html = `
     <img class="token_list_img" src="${tokens[i].logouri}">
-      <span class="token_list_text">${tokens[i].symbol}</span>
+      <span class="token_list_text">${tokens[i].symbol} ${tokens[i].name}</span>
       `;
     div.innerHTML = html;
     // selectToken() will be called when a token is clicked
@@ -69,6 +85,10 @@ document.getElementById("from_token_select").onclick = () => {
 document.getElementById("to_token_select").onclick = () => {
   openModal("to");
 };
+const search_token = document.getElementById("search_token");
+search_token.addEventListener("input", filterTokens);
+
+
 // function to open the modal view of token list
 function  openModal(side){
     // Store whether the user has selected a token on the from or to side
