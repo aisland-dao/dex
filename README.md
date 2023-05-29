@@ -28,7 +28,9 @@ to let it work in background, use systemctl
 
 TODO:
 - Allow to change the blockchain 
+- Allow to connect wallet fom Swap Button (enable and change text initially)
 - check balance of the token before swapping
+- check slippage protection + MEV
 - improve tokens ranking by additional data like market cap.
 - integrate tokens from https://tokenlists.org/token-list?url=https://gateway.ipfs.io/ipns/tokens.uniswap.org
 - add Token Metadata from https://coinmarketcap.com/api/documentation/v1/#operation/getV2CryptocurrencyInfo
