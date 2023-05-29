@@ -27,13 +27,16 @@ Execute:
 to let it work in background, use systemctl
 
 TODO:
-- Show errors from the backend engine
 - Allow to change the blockchain 
 - check balance of the token before swapping
 - improve tokens ranking by additional data like market cap.
 - integrate tokens from https://tokenlists.org/token-list?url=https://gateway.ipfs.io/ipns/tokens.uniswap.org
 - add Token Metadata from https://coinmarketcap.com/api/documentation/v1/#operation/getV2CryptocurrencyInfo
-- 
+- filter tokens by blockhain
+- add ranking filters
+- add trending filters
+- add privacy policy
+- add condition of use policy
 
 
 
