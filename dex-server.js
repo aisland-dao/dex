@@ -1,3 +1,4 @@
+// Dex Server - It allows to fetch static files and API
 let express = require('express');
 let fs=require("fs");
 const path = require('path')
@@ -47,6 +48,7 @@ async function mainloop(){
         database : DB_NAME,
         multipleStatements : true
     });
+    // main page is dex.html with a permannet redirect
     app.get('/', async function (req, res) {
        res.redirect(301, 'dex.html');     
     });
@@ -82,16 +84,17 @@ async function mainloop(){
        console.log("Quote: ", swapQuoteJSON);
        res.send(JSON.stringify(swapQuoteJSON));
     });
+    // fetch tokens list
     app.get('/tokens',async function (req, res) {
-        const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens order by ranking desc,name');
+        const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens order by ranking desc,symbol');
         //console.log(rows);
         res.send(JSON.stringify(rows));
     });
 
     // get files from html folder
     app.use(express.static('html'));
-    app.use('/usr/src/dex/html', express.static(path.join(__dirname, 'html')))
 
     //listen on port 3000
+    // a reverse proxy is necessary to use https
     let server = app.listen(3000, function () { });
 }
