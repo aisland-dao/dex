@@ -148,13 +148,24 @@ async  function  getPrice(){
     buyToken: currentTrade.to.address,
     sellAmount: amount,
   }
-  console.log(params,params);
+  document.getElementById('message').innerHTML='';
   // Fetch the swap price.
   const response = await fetch(`https://dex.aisland.io/price?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':'ef2f16cd-2ff8-46d7-8132-acbaa16d0a34'},},);
   swapPriceJSON = await  response.json();
   console.log("Price: ", swapPriceJSON);
+  // in case of error
+  if(typeof swapPriceJSON.code !== 'undefined'){
+    let message='<div class="alert alert-danger" role="alert">Error: '+swapPriceJSON.code.toString()+" - "+swapPriceJSON.reason;
+    message=message+" - "+swapPriceJSON.validationErrors[0].description;
+    message=message+'</div><hr>';
+    document.getElementById('message').innerHTML=message;
+    document.getElementById("to_amount").value=0;
+    return;
+  }
   // Use the returned values to populate the buy Amount and the estimated gas in the UI
-  document.getElementById("to_amount").value = swapPriceJSON.buyAmount / (10 ** currentTrade.to.decimals);
+  let price=swapPriceJSON.buyAmount / (10 ** currentTrade.to.decimals);
+  price=price.toFixed(6);
+  document.getElementById("to_amount").value = price;
   let gasusd=swapPriceJSON.estimatedGas*swapPriceJSON.gasPrice/1000000000000000000*1840;
   document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas.toString()+"( "+gasusd.toFixed(2).toString()+" USD)";
 
