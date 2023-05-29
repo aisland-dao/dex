@@ -27,6 +27,7 @@ Execute:
 to let it work in background, use systemctl
 
 TODO:
+- Set Minimum allowance
 - Allow to change the blockchain 
 - Allow to connect wallet fom Swap Button (enable and change text initially)
 - check balance of the token before swapping
