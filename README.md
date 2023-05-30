@@ -7,7 +7,7 @@ Under the hood, it uses the great [0x protocol](https://0x.org)
 ## Requirements:
 Operating System:  
 - [Linux Operating System](https://www.debian.org) (tested on Debian 11, it should work in any another). 
-Packages:  
+Packages to be installed:
 - [Nodejs v.20.x](https://nodejs.org). 
 - [Mariadb Server](https://mariadb.org).   
 - [Nginx](https://www.nginx.com) used as reverse proxy for https connections.  
@@ -19,17 +19,22 @@ From command line, clone this repository in the folder /usr/src/:
  cd /usr/src/  
  git clone https://github.com/aisland-dao/dex/  
 ```
-
-Execute: 
-- npm install  
-- customisation of the files .sh
-- configure the Nginx reverse proxy to reach port tcp/3000
-- create database with:   
+Install the required packages using npm:  
+```bash
+npm install  
+```
+Create a database with:   
+```bash
 mysql   
 create database dex;  
-- create tables with:
+```
+create the database tables with:  
+```bash
 mysql dex <create_tables.sql  
-
+```
+- customise all the files .sh
+- configure the Nginx reverse proxy to reach port tcp/3000
+- 
 ## Run
 Execute:  
 
