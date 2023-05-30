@@ -27,23 +27,4 @@ Execute:
 to let it work in background, use systemctl
 
 TODO:
-- Set Minimum allowance
-- disable swap on unsuppoerted blockchain
-- Allow to connect wallet fom Swap Button (enable and change text initially)
-- check balance of the token before swapping
-- check slippage protection + MEV
-- improve tokens ranking by additional data like market cap.
-- integrate tokens from https://tokenlists.org/token-list?url=https://gateway.ipfs.io/ipns/tokens.uniswap.org
-- add Token Metadata from https://coinmarketcap.com/api/documentation/v1/#operation/getV2CryptocurrencyInfo
-- filter tokens by blockhain
-- add ranking filters
-- add trending filters
-- add privacy policy
-- add condition of use policy
-
-
-
-
-
-
-
+See  the issues tab, we load the improvements to be done and bugs discovered.
