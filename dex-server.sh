@@ -1,4 +1,5 @@
 #!/bin/bash
+# Api Key from https://0x.org
 export APIKEY=".."
 export DB_HOST="localhost"
 export DB_NAME=".."
