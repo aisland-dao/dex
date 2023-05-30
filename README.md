@@ -15,10 +15,10 @@ Packages:
 
 ## Installation:
 From command line, clone this repository in the folder /usr/src/:  
-``bash
+```bash
  cd /usr/src/  
  git clone https://github.com/aisland-dao/dex/  
-``
+```
 
 Execute: 
 - npm install  
