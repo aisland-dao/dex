@@ -5,9 +5,11 @@ This package is a simple Dex crosschain. You can check the installed version her
 Under the hood, it uses the great [0x protocol](https://0x.org)
 
 ## Requirements:
+Operating System:  
+- [Linux Operating System](https://www.debian.org) (tested on Debian 11, it should work in another). 
+Packages:  
 - [Nodejs v.20.x](https://nodejs.org). 
 - [Mariadb Server](https://mariadb.org).   
-- [Linux Operating System](https://www.debian.org) (tested on Debian 11, it should work in another). 
 - [Nginx](https://www.nginx.com) used as reverse proxy for https connections.  
 
 ## Installation:
