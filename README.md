@@ -1,6 +1,7 @@
 # Aisland Crosschain Dex
 This package is a simple Dex crosschain as you can test from:  
-[https://dex.aisland.io](https://dex.aisland.io)
+[https://dex.aisland.io](https://dex.aisland.io)  
+under the hood, it uses the great [0x protocol](https://0x.org)
 
 ## Requirements:
 - Nodejs
