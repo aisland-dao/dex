@@ -1,5 +1,5 @@
 # Aisland Crosschain Dex
-This package is a simple Dex crosschain as you can test from:  
+This package is a simple Dex crosschain. You can check the installed version here:  
 [https://dex.aisland.io](https://dex.aisland.io)  
 under the hood, it uses the great [0x protocol](https://0x.org)
 
