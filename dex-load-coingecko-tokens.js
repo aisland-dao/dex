@@ -48,10 +48,13 @@ async function mainloop(){
     let fieldsv;
     // iterate all the tokens
     let i=0;
+    console.log(js);
     for(i in js){
         //console.log(js.tokens[i].symbol);
-        for(x in js[i].platform){
-            update_token(js[i],js[i].platform[x],connection);
+        const k=Object.keys(js[i].platforms);
+        const v=Object.values(js[i].platforms)
+        for(x in k){
+            await update_token(js[i],k[x],v[x],connection);
         }
 
     }    
@@ -60,17 +63,19 @@ async function mainloop(){
     process.exit(0);
 }
 // function to update the record of the token
-async function update_token(js,platform,connection){
+async function update_token(js,platform,address,connection){
         const [rows, fields] = await connection.execute('select * from tokens where symbol=? and platform=?',[js.symbol,platform]);
         if(rows.length==0){
-                  sqlquery="insert into tokens set symbol=?,name=?,decimals=?,chainid=?,address=?,originallogouri=?,dtupdate=now()";
-                  fieldsv= [js.tokens[i].symbol,js.tokens[i].name,js.tokens[i].decimals,js.tokens[i].chainId,js.tokens[i].address,uri];
+                  sqlquery="insert into tokens set symbol=?,name=?,decimals=?,platform=?,address=?,dtupdate=now()";
+                  console.log(sqlquery);
+                  fieldsv= [js.symbol,js.name,js.decimals,platform,address];
                   //console.log(fieldsv);
                   await connection.execute(sqlquery,fieldsv);
         }
         else{
-                  sqlquery="update tokens set name=?,decimals=?,chainid=?,address=?,originallogouri=?,dtupdate=now() where symbol=?";
-                  fieldsv=[js.tokens[i].name,js.tokens[i].decimals,js.tokens[i].chainId,js.tokens[i].address,uri,js.tokens[i].symbol];
+                  sqlquery="update tokens set name=?,decimals=?,platform=?,address=?,dtupdate=now() where symbol=?";
+                  console.log(sqlquery);
+                  fieldsv=[js.name,js.decimals,platform,address,js.symbol];
                   await connection.execute(sqlquery,fieldsv);
         }
 }

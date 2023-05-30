@@ -92,7 +92,8 @@ search_token.addEventListener("input", filterTokens);
 // render the blockchain name
 show_blockchain_name();
 // listen for change of the blockchain and reaload in casen
-window.ethereum.on('chainChanged', (chainId) => window.location.reload());
+if (typeof  window.ethereum !== "undefined")
+  window.ethereum.on('chainChanged', (chainId) => window.location.reload());
 // popover call
 $(function () {
   $('[data-toggle="popover"]').popover()
@@ -100,7 +101,13 @@ $(function () {
 // function to show the blockchain name
 async function show_blockchain_name(){
   // fetch the chainid
-  const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+  let chainId;
+  try {
+     chainId = await window.ethereum.request({ method: 'eth_chainId' });
+  } catch(e){
+    console.log(e);
+    return;
+  }
   // set the title
   let m="<H4>Swap";
   let b=" from unsupported network ("+chainId.toString()+")";
