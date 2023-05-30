@@ -1,13 +1,14 @@
 # Aisland Crosschain Dex
 This package is a simple Dex crosschain. You can check the installed version here:  
 [https://dex.aisland.io](https://dex.aisland.io)  
-under the hood, it uses the great [0x protocol](https://0x.org)
+
+Under the hood, it uses the great [0x protocol](https://0x.org)
 
 ## Requirements:
-- Nodejs
-- Mariadb Server
-- Linux Debian 11
-- Nginx as Reverse proxy
+- [Nodejs v.20.x](https://nodejs.org). 
+- [Mariadb Server](https://mariadb.org).   
+- [Linux Operating System](https://www.debian.org) (tested on Debian 11, it should work in another). 
+- [Nginx](https://www.nginx.com) used as reverse proxy for https connections.  
 
 ## Installation:
 Copy in  /usr/src/dex the repo and execute:  
