@@ -14,10 +14,10 @@ Packages:
 - [Git](https://git-scm.com/)
 
 ## Installation:
-From command line, clone this repository in the folder /usr/src/
+From command line, clone this repository in the folder /usr/src/:  
 ``bash
- cd /usr/src/
- git clone https://github.com/aisland-dao/dex/
+ cd /usr/src/  
+ git clone https://github.com/aisland-dao/dex/  
 ``
 
 Execute: 
