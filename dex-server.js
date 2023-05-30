@@ -60,10 +60,13 @@ async function mainloop(){
          buyToken: req.query.buyToken,
          sellAmount: req.query.sellAmount,
        }
-       console.log(req.query);
-       console.log(params);
+       let chainId=req.query.chainId;
+       const endpoint= await get_api_endpoint(chainId);
+       //console.log(endpoint);
+       //console.log(req.query);
+       //console.log(params);
        // Fetch the swap price.
-       const response = await fetch(`https://api.0x.org/swap/v1/price?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':APIKEY},},);
+       const response = await fetch(`${endpoint}price?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':APIKEY},},);
        let swapPriceJSON = await  response.json();
        console.log("Price: ", swapPriceJSON);
        res.send(JSON.stringify(swapPriceJSON));
@@ -77,9 +80,11 @@ async function mainloop(){
          sellAmount: req.query.sellAmount,
          //takerAddress: req.query.takerAddress,
        }
-       console.log("params ",params);
+       //console.log("params ",params);
+       let chainId=req.query.chainId;
+       const endpoint= await get_api_endpoint(chainId);
        // Fetch the swap price.
-       const response = await fetch(`https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':APIKEY},},);
+       const response = await fetch(`${endpoint}quote?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':APIKEY},},);
        let swapQuoteJSON = await  response.json();
        console.log("Quote: ", swapQuoteJSON);
        res.send(JSON.stringify(swapQuoteJSON));
@@ -97,4 +102,38 @@ async function mainloop(){
     //listen on port 3000
     // a reverse proxy is necessary to use https
     let server = app.listen(3000, function () { });
+}
+async function get_api_endpoint(chainId){
+    if(typeof chainId=='undefined' || chainId==0x1){
+       return("https://api.0x.org/swap/v1/");
+    }
+    // polygon
+    if(chainId==0x89){
+       return("https://polygon.api.0x.org/swap/v1/");
+    }
+    // Binance Smart Chain
+    if(chainId==0x38){
+       return("https://bsc.api.0x.org/swap/v1/");
+    }
+    // Optimism
+    if(chainId==0xa){
+       return("https://optimism.api.0x.org/swap/v1/");
+    }
+    // Fantom
+    if(chainId==0xfa){
+       return("https://fantom.api.0x.org/swap/v1/");
+    }
+    // Celo
+    if(chainId==0xa4ec){
+       return("https://celo.api.0x.org/swap/v1/");
+    }
+    // Avalanche
+    if(chainId==0xa86a){
+       return("https://avalanche.api.0x.org/swap/v1/");
+    }
+    // Arbitrum
+    if(chainId==0xa4b1){
+       return("https://arbitrum.api.0x.org/swap/v1/");
+    }
+    
 }

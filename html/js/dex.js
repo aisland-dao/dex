@@ -74,6 +74,7 @@ async function filterTokens(){
     parent.appendChild(div);
   }
 }
+// main body called a the loading
 // load the tokens immediately
 listAvailableTokens();
 // Call the connect function when the login_button is clicked
@@ -85,10 +86,44 @@ document.getElementById("from_token_select").onclick = () => {
 document.getElementById("to_token_select").onclick = () => {
   openModal("to");
 };
+// search tokens event
 const search_token = document.getElementById("search_token");
 search_token.addEventListener("input", filterTokens);
+// render the blockchain name
+show_blockchain_name();
+// listen for change of the blockchain and reaload in casen
+window.ethereum.on('chainChanged', (chainId) => window.location.reload());
+// popover call
+$(function () {
+  $('[data-toggle="popover"]').popover()
+});
+// function to show the blockchain name
+async function show_blockchain_name(){
+  // fetch the chainid
+  const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+  // set the title
+  let m="<H4>Swap";
+  let b=" from unsupported network ("+chainId.toString()+")";
+  if(chainId==0x1)
+    b="from Ethereum";
+  if(chainId==0x89)
+    b="from Polygon";
+  if(chainId==0x38)
+    b="from BSC";  
+  if(chainId==0xa)
+    b="from Optimism";      
+  if(chainId==0xfa)
+    b="from Fantom";    
+  if(chainId==0xa4ec)
+    b="from Celo";        
+  if(chainId==0xa86a)
+    b="from Avalanche";        
+  if(chainId==0xa4b1)
+    b="from Arbitrum";        
+  m+=" "+b+"</H4>";
+  document.getElementById("blockchain").innerHTML = m;
 
-
+}
 // function to open the modal view of token list
 function  openModal(side){
     // Store whether the user has selected a token on the from or to side
