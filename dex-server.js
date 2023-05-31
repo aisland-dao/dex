@@ -95,6 +95,61 @@ async function mainloop(){
         //console.log(rows);
         res.send(JSON.stringify(rows));
     });
+    // get token price in USD (for gas fees only, so only a few tokens are supported)
+    app.get('/priceusd',async function (req, res) {
+       let token=req.query.token;
+       if(typeof token === 'undefined')	{
+          res.send('{"price":0.0}');
+          return;
+       }
+        
+       let tokens=['ETH','MATIC','BNB','CELO','FTM','AVAX'];
+       //check for supported token
+       let x=-1;
+       for(i=0;i<tokens.length;i++){
+          if(tokens[i]===token){
+             x=i;
+             break;
+          }
+       }
+       //for unsupported token returns 0
+       if(x==-1){
+          res.send('{"price":0.0}');
+          return;
+       }
+       // search for updated prices in the database (last 5 minutes price)
+        const [rows, fields] = await connection.execute("select * from prices where symbol=? and dtupdate>now() - interval 5 minute",[token]);       
+        if(rows.length==0){
+            //get update price from coingecko
+            let id;
+            let name;
+            if(token=="ETH")
+              id="ethereum";
+            if(token=="MATIC")
+              id="matic-network";
+            if(token=="BNB")
+              id="binancecoin";
+            if(token=="CELO")
+              id="celo";  
+            if(token=="FTM")
+              id="fantom";  
+            if(token=="AVAX")
+              id="avalanche-2";
+            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=USD`,{method: 'GET'},);
+            const price = await  response.json();       
+            console.log("Sending price for: ",id," = ",price[id]['usd']);
+            // store in the database as cache
+            await connection.execute("delete from prices where  symbol=?",[token]);
+            await connection.execute("insert into prices set symbol=?,name=?,decimals=18,priceusd=?,dtupdate=now()",[token,token,price[id]['usd']]);
+            // return price
+            res.send('{"price":'+price[id]['usd'].toString()+'}');
+            return;
+        }
+        else {
+           res.send('{"price":'+rows[0].priceusd.toString()+'}');
+           return;
+        }
+    });
 
     // get files from html folder
     app.use(express.static('html'));

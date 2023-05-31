@@ -1,5 +1,4 @@
-drop table tokens;
-create table tokens(
+create table if not exists tokens(
     id int(11) auto_increment,
     symbol varchar(32) not null,
     name varchar(128) not null,
@@ -11,4 +10,13 @@ create table tokens(
     originallogouri varchar(512) default '',
     dtupdate datetime not null,
     PRIMARY KEY (id)
+);
+
+create table if not exists prices(
+    symbol varchar(32) not null,
+    name varchar(128) not null,
+    decimals int not null,
+    priceusd numeric(14,6) not null,
+    dtupdate datetime not null,
+    PRIMARY KEY (symbol)
 );
