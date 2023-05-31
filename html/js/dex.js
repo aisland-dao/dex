@@ -33,7 +33,6 @@ async  function  connect() {
 
 // load the tokens
 async function listAvailableTokens(){
-  console.log("initializing");
   let response = await fetch('https://dex.aisland.io/tokens');
   tokens = await response.json();
   await filterTokens("");
@@ -131,6 +130,7 @@ async function show_blockchain_name(){
   document.getElementById("blockchain").innerHTML = m;
 
 }
+
 // function to open the modal view of token list
 function  openModal(side){
     // Store whether the user has selected a token on the from or to side
@@ -208,7 +208,8 @@ async  function  getPrice(){
   let price=swapPriceJSON.buyAmount / (10 ** currentTrade.to.decimals);
   price=price.toFixed(6);
   document.getElementById("to_amount").value = price;
-  let gasusd=swapPriceJSON.estimatedGas*swapPriceJSON.gasPrice/1000000000000000000*1840;
+  let priceusd=await getpriceusd();
+  let gasusd=swapPriceJSON.estimatedGas*swapPriceJSON.gasPrice/1000000000000000000*priceusd;
   document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas.toString()+"( "+gasusd.toFixed(2).toString()+" USD)";
 
 }
@@ -233,8 +234,9 @@ async function getQuote(account){
   console.log("Quote: ", swapQuoteJSON);
   
   document.getElementById("to_amount").value = swapQuoteJSON.buyAmount / (10 ** currentTrade.to.decimals);
-  document.getElementById("gas_estimate").innerHTML = swapQuoteJSON.estimatedGas;
-
+  let priceusd=await getpriceusd();
+  let gasusd=swapPriceJSON.estimatedGas*swapPriceJSON.gasPrice/1000000000000000000*priceusd;
+  document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas.toString()+"( "+gasusd.toFixed(2).toString()+" USD)";
   return swapQuoteJSON;
 }
 //function to to perform the Swap (it may fail)
@@ -267,4 +269,37 @@ async  function  trySwap(){
   // Perform the swap
   const  receipt = await  web3.eth.sendTransaction(swapQuoteJSON);
   console.log("receipt: ", receipt);
+}
+// function to show the get the price in USD of the native token of the selectet blockchain,for gas fees in USD.
+async function getpriceusd(){
+  // fetch the chainid
+  let chainId;
+  try {
+     chainId = await window.ethereum.request({ method: 'eth_chainId' });
+  } catch(e){
+    console.log(e);
+    return(0);
+  }
+  let t;
+  if(chainId==0x1)
+    t="ETH";
+  if(chainId==0x89)
+    t="MATIC";
+  if(chainId==0x38)
+    t="BNB";  
+  if(chainId==0xa)
+    t="ETH";      
+  if(chainId==0xfa)
+    t="FTM";    
+  if(chainId==0xa4ec)
+    t="CELO";        
+  if(chainId==0xa86a)
+    t="AVAX";        
+  if(chainId==0xa4b1)
+    t="ETH";        
+  // fetch price from our API server
+  let response = await fetch('https://dex.aisland.io/priceusd?token='+t);
+  let j = await response.json();
+  return(j['price']);
+
 }
