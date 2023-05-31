@@ -1,24 +1,40 @@
 # Aisland Crosschain Dex
-This package is a simple Dex crosschain as you can test from:  
-[https://dex.aisland.io](https://dex.aisland.io)
+This package is a simple Crosschain DEX. You can check the installed version here:  
+[https://dex.aisland.io](https://dex.aisland.io)  
+
+Under the hood, it uses the great [0x protocol](https://0x.org)
 
 ## Requirements:
-- Nodejs
-- Mariadb Server
-- Linux Debian 11
-- Nginx as Reverse proxy
+Operating System:  
+- [Linux Operating System](https://www.debian.org) (tested on Debian 11, it should work in any another). 
+Packages to be installed:
+- [Nodejs v.20.x](https://nodejs.org). 
+- [Mariadb Server](https://mariadb.org).   
+- [Nginx](https://www.nginx.com) used as reverse proxy for https connections.  
+- [Git](https://git-scm.com/)
 
 ## Installation:
-Copy in  /usr/src/dex the repo and execute:  
-- npm install  
-- customisation of the files .sh
-- configure the Nginx reverse proxy to reach port tcp/3000
-- create database with:   
+From command line, clone this repository in the folder /usr/src/:  
+```bash
+ cd /usr/src/  
+ git clone https://github.com/aisland-dao/dex/  
+```
+Install the required packages using npm:  
+```bash
+npm install  
+```
+Create a database with:   
+```bash
 mysql   
 create database dex;  
-- create tables with:
+```
+create the database tables with:  
+```bash
 mysql dex <create_tables.sql  
-
+```
+- customise all the files .sh
+- configure the Nginx reverse proxy to reach port tcp/3000
+- 
 ## Run
 Execute:  
 
@@ -27,23 +43,4 @@ Execute:
 to let it work in background, use systemctl
 
 TODO:
-- Set Minimum allowance
-- disable swap on unsuppoerted blockchain
-- Allow to connect wallet fom Swap Button (enable and change text initially)
-- check balance of the token before swapping
-- check slippage protection + MEV
-- improve tokens ranking by additional data like market cap.
-- integrate tokens from https://tokenlists.org/token-list?url=https://gateway.ipfs.io/ipns/tokens.uniswap.org
-- add Token Metadata from https://coinmarketcap.com/api/documentation/v1/#operation/getV2CryptocurrencyInfo
-- filter tokens by blockhain
-- add ranking filters
-- add trending filters
-- add privacy policy
-- add condition of use policy
-
-
-
-
-
-
-
+See  the issues tab, we load the improvements to be done and bugs discovered.
