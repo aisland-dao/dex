@@ -274,10 +274,9 @@ const web3 = require('web3');
 let  currentTrade = {};
 let  currentSelectSide;
 let tokens;
+let connected=false;
 
 async  function  connect() {
-/** MetaMask injects a global API into websites visited by its users at `window.ethereum`. This API allows websites to request users' Ethereum accounts, read data from blockchains the user is connected to, and suggest that the user sign messages and transactions. The presence of the provider object indicates an Ethereum user. Read more: https://ethereum.stackexchange.com/a/68294/85979**/
-
 // Check if MetaMask is installed, if it is, try connecting to an account
     if (typeof  window.ethereum !== "undefined") {
         try {
@@ -286,16 +285,19 @@ async  function  connect() {
             await  ethereum.request({ method:  "eth_requestAccounts" });
         } catch (error) {
             console.log(error);
+            return;
         }
+        connected=true;
         // If connected, change button to "Connected"
         document.getElementById("login_button").innerHTML = "Connected";
         // If connected, enable "Swap" button
-        document.getElementById("swap_button").disabled = false;
+        //document.getElementById("swap_button").disabled = false;
+        document.getElementById("swap_button").innerHTML = "Swap";
     } 
     // Ask user to install MetaMask if it's not detected 
     else {
-        document.getElementById("login_button").innerHTML =
-        "Please install MetaMask";
+        document.getElementById("login_button").innerHTML = "Please install MetaMask";
+        document.getElementById("swap_button").innerHTML = "Please install MetaMask";
     }
 }
 
@@ -509,6 +511,10 @@ async function getQuote(account){
 }
 //function to to perform the Swap (it may fail)
 async  function  trySwap(){
+  if(connected==false){
+    connect();
+    return;
+  }
   // The address, if any, of the most recently used account that the caller is permitted to access
   let accounts = await ethereum.request({ method: "eth_accounts" });
   let takerAddress = accounts[0];
