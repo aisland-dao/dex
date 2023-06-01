@@ -1,4 +1,4 @@
-# Aisland Crosschain Dex
+# Aisland Crosschain Dex (Decentralised Exchange)
 This package is a Crosschain DEX that is supporting natively 8 different blockchains:
 - Ethereum
 - Polygon
