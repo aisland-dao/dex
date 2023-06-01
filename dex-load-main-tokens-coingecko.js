@@ -1,5 +1,4 @@
-// app to update the tokens table from Uniswap token list downloaded form coingecko
-// https://tokens.coingecko.com/uniswap/all.json
+// app to update the tokens table from Uniswap list from https://gateway.ipfs.io/ipns/tokens.uniswap.org
 let mysql = require('mysql2/promise');
 let fs=require("fs");
 
