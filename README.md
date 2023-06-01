@@ -78,7 +78,7 @@ dex-load-coingecko-tokens.sh
 ```
 and launch it from the standard folder:
 ```
-/usr/src/dex/dex-load-coingecko-tokens.sh
+/usr/src/dex/dex-load-main-tokens-coingecko.sh
 ```
 You should run automatically the app one time a week from crontab. You can add the automatic job with:  
 ```bash
@@ -86,7 +86,7 @@ crontab -e
 ```
 and add the following line:
 ```bash
-15 0 * * 0 /usr/src/dex/dex-load-coingecko-tokens.sh.sh >>/tmp/dex-load-coingecko-tokens.log
+15 0 * * 0 /usr/src/dex/dex-load-main-tokens-coingecko.sh >>/tmp/dex-load-main-tokens-coingecko.log
 ```
 It will be executed every Sunday at 15 minutes past Midnight
 
