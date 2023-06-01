@@ -9,12 +9,16 @@ This package is a Crosschain DEX that is supporting natively 8 different blockch
 - Avalanche 
 - Arbitrum
 
+
 You can use the on-line version here:  
 [https://dex.aisland.io](https://dex.aisland.io)  
 
-Under the hood, it uses the great [0x protocol](https://0x.org)
+With > 4000 tokens listed.
 
-You can easily make your own DEX with a minimal effort.
+Under the hood, it uses the great [0x protocol](https://0x.org)  
+and the list of tradable tokens is filtered out from [https://tokenlists.org/](https://tokenlists.org/) (an Uniswap Project).  
+
+You can easily make your own DEX with a minimal effort, just changing your logo and colors in a few html/css files.
 
 ## Installation Requirements:
 Operating System:  
@@ -32,11 +36,11 @@ Hardware Requirements:
 A virtual machine from any cloud provider will work perfectly.  
 
 ## Installation Debian/Ubuntu:
-You can install Mariadb,Git and Nginx with:
+Install Mariadb,Git and Nginx:
 ```bash
 apt-get -y install mariadb-server git nginx
 ```
-The version in the package of the OS is quite old so we have to install the Nodejs, following the instructions from the official website: [https://nodejs.org](https://nodejs.org)
+The version in the package of the OS is quite old so following the instructions from the official website: [https://nodejs.org](https://nodejs.org) to install the version >= 20.x.  
 
 From command line, clone this repository in the folder /usr/src/:  
 ```bash
