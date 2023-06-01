@@ -1,19 +1,43 @@
 # Aisland Crosschain Dex
-This package is a simple Crosschain DEX. You can check the installed version here:  
+This package is a Crosschain DEX that is supporting natively 8 different blockchains:
+- Ethereum
+- Polygon
+- Binance Smart Chain
+- Optimism
+- Fantom 
+- Celo 
+- Avalanche 
+- Arbitrum
+
+You can use the on-line version here:  
 [https://dex.aisland.io](https://dex.aisland.io)  
 
 Under the hood, it uses the great [0x protocol](https://0x.org)
 
-## Requirements:
+You can easily make your own DEX with a minimal effort.
+
+## Installation Requirements:
 Operating System:  
-- [Linux Operating System](https://www.debian.org) (tested on Debian 11, it should work in any another). 
+- [Debian/Ubuntu Linux Operating System](https://www.debian.org)  
+(it work in any Linux OS with small changes to the installation steps)
+
 Packages to be installed:
 - [Nodejs v.20.x](https://nodejs.org). 
 - [Mariadb Server](https://mariadb.org).   
 - [Nginx](https://www.nginx.com) used as reverse proxy for https connections.  
 - [Git](https://git-scm.com/)
 
-## Installation:
+Hardware Requirements:  
+4 GB RAM, 10 GB disk for the OS and couple of CPU.  
+A virtual machine from any cloud provider will work perfectly.  
+
+## Installation Debian/Ubuntu:
+You can install Mariadb,Git and Nginx with:
+```bash
+apt-get -y install mariadb-server git nginx
+```
+The version in the package of the OS is quite old so we have to install the Nodejs, following the instructions from the official website: [https://nodejs.org](https://nodejs.org)
+
 From command line, clone this repository in the folder /usr/src/:  
 ```bash
  cd /usr/src/  
@@ -30,7 +54,7 @@ create database dex;
 ```
 create the database tables with:  
 ```bash
-mysql dex <create_tables.sql  
+mysql dex <dump.sql  
 ```
 - customise all the files .sh
 - configure the Nginx reverse proxy to reach port tcp/3000
@@ -42,8 +66,8 @@ Execute:
 
 to let it work in background, use systemctl
 
-## Update Ranking
-There is an utility app to update the ranking from coingecko api. 
+## Tokens Ranking
+There is an utility to update the ranking from coingecko api. 
 You should configure the database parameters editing the text file:  
 ```
 dex-update-tokens-ranking-coingecko.sh
@@ -52,4 +76,13 @@ and launch it from the standard folder:
 ```
 /usr/src/dex/dex-update-tokens-ranking-coingecko.sh
 ```
-You should run automatically the app one time a week from crontab
+You should run automatically the app one time a week from crontab. You can add the automatic job with:  
+```bash
+crontab -e
+```
+and add the following line:
+```bash
+0 0 * * 0 /usr/src/dex/dex-update-tokens-ranking-coingecko.sh >>/tmp/dex-update-tokens-ranking-coingecko.log
+```
+It will be executed every Sunday at Midnight.
+
