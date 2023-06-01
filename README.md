@@ -9,12 +9,16 @@ This package is a Crosschain DEX that is supporting natively 8 different blockch
 - Avalanche 
 - Arbitrum
 
+
 You can use the on-line version here:  
 [https://dex.aisland.io](https://dex.aisland.io)  
 
-Under the hood, it uses the great [0x protocol](https://0x.org)
+With > 4000 tokens listed.
 
-You can easily make your own DEX with a minimal effort.
+Under the hood, it uses the great [0x protocol](https://0x.org)
+and list of tradable tokens is filtered out from [https://tokenlists.org/](https://tokenlists.org/)
+
+You can easily make your own DEX with a minimal effort, just changing your logo and colors in a few html/css files.
 
 ## Installation Requirements:
 Operating System:  
