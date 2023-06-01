@@ -36,11 +36,11 @@ Hardware Requirements:
 A virtual machine from any cloud provider will work perfectly.  
 
 ## Installation Debian/Ubuntu:
-You can install Mariadb,Git and Nginx with:
+Install Mariadb,Git and Nginx:
 ```bash
 apt-get -y install mariadb-server git nginx
 ```
-The version in the package of the OS is quite old so we have to install the Nodejs, following the instructions from the official website: [https://nodejs.org](https://nodejs.org)
+The version in the package of the OS is quite old so following the instructions from the official website: [https://nodejs.org](https://nodejs.org) to install the version >= 20.x.  
 
 From command line, clone this repository in the folder /usr/src/:  
 ```bash
