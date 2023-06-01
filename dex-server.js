@@ -16,6 +16,8 @@ const DB_HOST = process.env.DB_HOST
 const DB_NAME = process.env.DB_NAME
 const DB_USER = process.env.DB_USER
 const DB_PWD = process.env.DB_PWD
+const WALLET = process.env.WALLET
+const FEES=process.env.FEES;
 // set default to local host if not set
 if (typeof DB_HOST === 'undefined') {
     console.log(Date.now(), "[Error] the environment variable DB_HOST is not set.");
@@ -33,6 +35,14 @@ if (typeof DB_USER === 'undefined') {
 // DB_PWD is mandatory
 if (typeof DB_PWD === 'undefined') {
     console.log(Date.now(), "[Error] the environment variable DB_PWD is not set.");
+    process.exit(1);
+}
+if (typeof WALLET=== 'undefined') {
+    console.log(Date.now(), "[Error] the environment variable WALLET is not set.");
+    process.exit(1);
+}
+if (typeof FEES=== 'undefined') {
+    console.log(Date.now(), "[Error] the environment variable FEES is not set.");
     process.exit(1);
 }
 console.log("Dex Server - v.1.00");
@@ -59,12 +69,12 @@ async function mainloop(){
          sellToken: req.query.sellToken,
          buyToken: req.query.buyToken,
          sellAmount: req.query.sellAmount,
+         buyTokenPercentageFee: FEES,
+         feeRecipient: WALLET,
+         affiliateAddress: WALLET
        }
        let chainId=req.query.chainId;
        const endpoint= await get_api_endpoint(chainId);
-       //console.log(endpoint);
-       //console.log(req.query);
-       //console.log(params);
        // Fetch the swap price.
        const response = await fetch(`${endpoint}price?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':APIKEY},},);
        let swapPriceJSON = await  response.json();
@@ -79,6 +89,9 @@ async function mainloop(){
          buyToken: req.query.buyToken,
          sellAmount: req.query.sellAmount,
          //takerAddress: req.query.takerAddress,
+         buyTokenPercentageFee: FEES,
+         feeRecipient: WALLET,
+         affiliateAddress: WALLET
        }
        //console.log("params ",params);
        let chainId=req.query.chainId;

@@ -111,16 +111,24 @@ and add the following line:
 It will be executed every Sunday at Midnight.
 
 ## Protocol Fees
-You can customise the protocol fees and address to receive them, changing the following variable values in dex.js:  
-- buyTokenPercentageFee: 0.001,  
-- feeRecipient: '0xbec1Ed0dFc75955486977cc843293fe03ecA657D',  
-- affiliateAddress: '0xbec1Ed0dFc75955486977cc843293fe03ecA657D'
-You can search for such names using the text editor.
+You can customise the protocol fees and address to receive them, changing the following variable values in
+"dex-server.sh": 
+``` 
+export WALLET='0xbec1Ed0dFc75955486977cc843293fe03ecA657D'
+export FEES=0.001
+```
+You can leave our wallet if you wish to contribute to our efforts or place yours.
+0.001 = 0.1% of fees, 1 = 100%.
+
+## Coding Changes  
+  
 Remember to execute:  
 ```bash
 /usr/srd/dex/build-bundle.sh
 to update the bundle.js
 ```
+if you change dex.js, since it's bundled together with some libraries.
+
 
 ## Contribution  
 

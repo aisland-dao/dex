@@ -192,9 +192,6 @@ async  function  getPrice(){
     sellToken: currentTrade.from.address,
     buyToken: currentTrade.to.address,
     sellAmount: amount,
-    buyTokenPercentageFee: 0.001,
-    feeRecipient: '0xbec1Ed0dFc75955486977cc843293fe03ecA657D',
-    affiliateAddress: '0xbec1Ed0dFc75955486977cc843293fe03ecA657D'
   }
   document.getElementById('message').innerHTML='';
   // Fetch the swap price.
@@ -232,10 +229,6 @@ async function getQuote(account){
     sellAmount: amount,
     // Set takerAddress to account 
     takerAddress: account,
-    // dex fees
-    buyTokenPercentageFee: 0.001,
-    feeRecipient: '0xbec1Ed0dFc75955486977cc843293fe03ecA657D',
-    affiliateAddress: '0xbec1Ed0dFc75955486977cc843293fe03ecA657D'
   }
   //console.log("params: ",params);
   // Fetch the swap quote.
