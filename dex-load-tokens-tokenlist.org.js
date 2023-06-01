@@ -6,6 +6,7 @@ const DB_HOST = process.env.DB_HOST
 const DB_NAME = process.env.DB_NAME
 const DB_USER = process.env.DB_USER
 const DB_PWD = process.env.DB_PWD
+const JSONFILE = process.env.JSONFILE
 // set default to local host if not set
 if (typeof DB_HOST === 'undefined') {
     console.log(Date.now(), "[Error] the environment variable DB_HOST is not set.");
@@ -25,7 +26,12 @@ if (typeof DB_PWD === 'undefined') {
     console.log(Date.now(), "[Error] the environment variable DB_PWD is not set.");
     process.exit(1);
 }
-console.log("Dex - Loading tokens from Uniswap v. 1.00");
+// JSON  is mandatory
+if (typeof JSONFILE === 'undefined') {
+    console.log(Date.now(), "[Error] the environment variable JSONFILE is not set.");
+    process.exit(1);
+}
+console.log("Dex - Loading tokens from tokenlist.org standard format - v. 1.00");
 mainloop();
 //main function body
 async function mainloop(){
@@ -38,7 +44,7 @@ async function mainloop(){
     });
     let j;
     try {
-      j = fs.readFileSync('/usr/src/dex/json/tokens-uniswap.json', 'utf8');
+      j = fs.readFileSync(JSONFILE, 'utf8');
     } catch (err) {
       console.error(err);
       return;
@@ -50,19 +56,19 @@ async function mainloop(){
     let i=0;
     for(i in js.tokens){
         //console.log(js.tokens[i].symbol);
-        const [rows, fields] = await connection.execute("select * from tokens where symbol=? and platform='ethereum'",[js.tokens[i].symbol]);
+        const [rows, fields] = await connection.execute("select * from tokens where symbol=? and chainid=?",[js.tokens[i].symbol,js.tokens[i].chainId]);
         let uri=js.tokens[i].logoURI;
         if(typeof uri === 'undefined')
           uri='';
         if(rows.length==0){
-                  sqlquery="insert into tokens set symbol=?,name=?,decimals=?,platform='ethereum',address=?,originallogouri=?,dtupdate=now()";
-                  fieldsv= [js.tokens[i].symbol,js.tokens[i].name,js.tokens[i].decimals,js.tokens[i].address,uri];
+                  sqlquery="insert into tokens set symbol=?,name=?,decimals=?,chainid=?,platform='ethereum',address=?,originallogouri=?,dtupdate=now()";
+                  fieldsv= [js.tokens[i].symbol,js.tokens[i].name,js.tokens[i].decimals,js.tokens[i].chainId,js.tokens[i].address,uri];
                   //console.log(fieldsv);
                   await connection.execute(sqlquery,fieldsv);
         }
         else{
-                  sqlquery="update tokens set name=?,decimals=?,platform='ethereum',address=?,originallogouri=?,dtupdate=now() where symbol=?";
-                  fieldsv=[js.tokens[i].name,js.tokens[i].decimals,js.tokens[i].address,uri,js.tokens[i].symbol];
+                  sqlquery="update tokens set name=?,decimals=?,platform='ethereum',address=?,originallogouri=?,dtupdate=now() where symbol=? and chainid=?";
+                  fieldsv=[js.tokens[i].name,js.tokens[i].decimals,js.tokens[i].address,uri,js.tokens[i].symbol,js.tokens[i].chainId];
                   await connection.execute(sqlquery,fieldsv);
         }
     }    
