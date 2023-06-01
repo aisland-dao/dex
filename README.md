@@ -29,16 +29,17 @@ Packages to be installed:
 - [Nodejs v.20.x](https://nodejs.org). 
 - [Mariadb Server](https://mariadb.org).   
 - [Nginx](https://www.nginx.com) used as reverse proxy for https connections.  
-- [Git](https://git-scm.com/)
+- [Git](https://git-scm.com)
+- [Curl](https://curl.se)
 
 Hardware Requirements:  
 4 GB RAM, 10 GB disk for the OS and couple of CPU.  
 A virtual machine from any cloud provider will work perfectly.  
 
 ## Installation Debian/Ubuntu:
-Install Mariadb,Git and Nginx:
+Install Mariadb, Git, Curl and Nginx:
 ```bash
-apt-get -y install mariadb-server git nginx
+apt-get -y install mariadb-server git nginx curl
 ```
 The version in the package of the OS is quite old so following the instructions from the official website: [https://nodejs.org](https://nodejs.org) to install the version >= 20.x.  
 

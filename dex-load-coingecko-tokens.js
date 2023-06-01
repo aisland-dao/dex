@@ -1,4 +1,4 @@
-// app to update the tokens table from Coingecko token list downloaded
+// app to update the tokens table from Coingecko token list as downloaded with curl
 let mysql = require('mysql2/promise');
 let fs=require("fs");
 
