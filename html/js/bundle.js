@@ -298,6 +298,7 @@ async  function  connect() {
     else {
         document.getElementById("login_button").innerHTML = "Please install MetaMask";
         document.getElementById("swap_button").innerHTML = "Please install MetaMask";
+        document.getElementById("message").innerHTML = 'Metamask is the most used Crypto Wallet on computer and mobile, please check the official website <a href="https://metamask.io">https://metamask.io</a><br>';
     }
 }
 
