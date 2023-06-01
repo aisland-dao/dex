@@ -1,7 +1,7 @@
 {
   "name": "dex",
   "version": "1.0.0",
-  "description": "Crossochain Decentralised Exchange",
+  "description": "Crosschain Decentralised Exchange",
   "main": "dex-server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
