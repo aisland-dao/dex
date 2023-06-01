@@ -42,5 +42,14 @@ Execute:
 
 to let it work in background, use systemctl
 
-TODO:
-See  the issues tab, we load the improvements to be done and bugs discovered.
+## Update Ranking
+There is an utility app to update the ranking from coingecko api. 
+You should configure the database parameters editing the text file:  
+```
+dex-update-tokens-ranking-coingecko.sh
+```
+and launch it from the standard folder:
+```
+/usr/src/dex/dex-update-tokens-ranking-coingecko.sh
+```
+You should run automatically the app one time a week from crontab
