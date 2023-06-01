@@ -15,8 +15,8 @@ You can use the on-line version here:
 
 With > 4000 tokens listed.
 
-Under the hood, it uses the great [0x protocol](https://0x.org)
-and list of tradable tokens is filtered out from [https://tokenlists.org/](https://tokenlists.org/)
+Under the hood, it uses the great [0x protocol](https://0x.org)  
+and the list of tradable tokens is filtered out from [https://tokenlists.org/](https://tokenlists.org/) (an Uniswap Project).  
 
 You can easily make your own DEX with a minimal effort, just changing your logo and colors in a few html/css files.
 
