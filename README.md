@@ -70,6 +70,25 @@ Execute:
 /usr/src/dex-server.sh 
 
 to let it work in background, use systemctl
+## Tokens Update
+There is an utility to load/update the tokens list reading the data from [https://tokenlists.org/](https://tokenlists.org/).
+You should configure the database parameters editing the text file:  
+```
+dex-load-coingecko-tokens.sh  
+```
+and launch it from the standard folder:
+```
+/usr/src/dex/dex-load-coingecko-tokens.sh
+```
+You should run automatically the app one time a week from crontab. You can add the automatic job with:  
+```bash
+crontab -e
+```
+and add the following line:
+```bash
+15 0 * * 0 /usr/src/dex/dex-load-coingecko-tokens.sh.sh >>/tmp/dex-load-coingecko-tokens.log
+```
+It will be executed every Sunday at 15 minutes past Midnight
 
 ## Tokens Ranking
 There is an utility to update the ranking from coingecko api. 
@@ -91,3 +110,19 @@ and add the following line:
 ```
 It will be executed every Sunday at Midnight.
 
+## Protocol Fees
+You can customise the protocol fees and address to receive them, changing the following variable values in dex.js:  
+- buyTokenPercentageFee: 0.001,  
+- feeRecipient: '0xbec1Ed0dFc75955486977cc843293fe03ecA657D',  
+- affiliateAddress: '0xbec1Ed0dFc75955486977cc843293fe03ecA657D'
+You can search for such names using the text editor.
+Remember to execute:  
+```bash
+/usr/srd/dex/build-bundle.sh
+to update the bundle.js
+```
+
+## Contribution  
+
+- Code contribution are welcome, please feel free to make a pull request.  
+- You give a good financial help to make more features, using our public app [https://dex.aisland.io](https://dex.aisland.io), the protocol will forward us 0.1% on the transaction value.  
