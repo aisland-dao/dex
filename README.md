@@ -120,7 +120,7 @@ export FEES=0.001
 You can leave our wallet if you wish to contribute to our efforts or place yours.
 0.001 = 0.1% of fees, 1 = 100%.
 
-## Coding Changes  
+## Code Changes  
   
 Remember to execute:  
 ```bash
