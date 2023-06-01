@@ -133,4 +133,4 @@ if you change dex.js, since it's bundled together with some libraries.
 ## Contribution  
 
 - Code contribution are welcome, please feel free to make a pull request.  
-- You give a good financial help to make more features, using our public app [https://dex.aisland.io](https://dex.aisland.io), the protocol will forward us 0.1% on the transaction value.  
+- You give a good financial help to make more features, using our public app [https://dex.aisland.io](https://dex.aisland.io), the protocol will forward us 0.01% on the transaction value.  
