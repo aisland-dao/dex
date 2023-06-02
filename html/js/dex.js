@@ -65,7 +65,7 @@ async function filterTokens(){
     div.className = "token_row";
     // For each row, display the token image and symbol
     let html = `
-    <img class="token_list_img" src="${tokens[i].logouri}">
+    <img class="token_list_img" src="${tokens[i].logouri}" width="25" height="25">
       <span class="token_list_text">${tokens[i].symbol} ${tokens[i].name}</span>
       `;
     div.innerHTML = html;
@@ -265,7 +265,8 @@ async  function  trySwap(){
   const ERC20TokenContract = new web3.eth.Contract(erc20abi, fromTokenAddress);
   console.log("setup ERC20TokenContract: ", ERC20TokenContract);
   // The max approval is set here. Using Bignumber to handle large numbers and account for overflow (https://github.com/MikeMcl/bignumber.js/)
-  const maxApproval = new BigNumber(2).pow(256).minus(1);
+  //const maxApproval = new BigNumber(2).pow(256).minus(1);
+  const maxApproval=new BigNumber(swapQuoteJSON.sellAmount);
   console.log("approval amount: ", maxApproval);
   // Grant the allowance target (the 0x Exchange Proxy) an  allowance to spend our tokens. Note that this is a txn that incurs fees. 
   const tx = await ERC20TokenContract.methods.approve(swapQuoteJSON.allowanceTarget,maxApproval,)

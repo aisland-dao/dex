@@ -104,7 +104,7 @@ async function mainloop(){
     });
     // fetch tokens list
     app.get('/tokens',async function (req, res) {
-        const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens order by ranking desc,symbol');
+        const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens where chainid=1 order by ranking desc,symbol');
         //console.log(rows);
         res.send(JSON.stringify(rows));
     });
