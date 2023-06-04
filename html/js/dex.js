@@ -192,9 +192,9 @@ async  function  getPrice(){
   //let  amount = Number(document.getElementById("from_amount").value * 10 ** currentTrade.from.decimals);
   let d=new BigNumber(10).pow(currentTrade.from.decimals);
   let amount=  new BigNumber(Number(document.getElementById("from_amount").value)).multipliedBy(d);
-  console.log("from_amount ",document.getElementById("from_amount").value);
-  console.log("currentTrade.from.decimals ",currentTrade.from.decimals);
-  console.log("amount: ",amount.toFixed());
+  //console.log("from_amount ",document.getElementById("from_amount").value);
+  //console.log("currentTrade.from.decimals ",currentTrade.from.decimals);
+  //console.log("amount: ",amount.toFixed());
   const params = {
     sellToken: currentTrade.from.address,
     buyToken: currentTrade.to.address,
@@ -228,12 +228,14 @@ async function getQuote(account){
   console.log("Getting Quote");
 
   if (!currentTrade.from || !currentTrade.to || !document.getElementById("from_amount").value) return;
-  let amount = Number(document.getElementById("from_amount").value * 10 ** currentTrade.from.decimals);
-
+  //let amount = Number(document.getElementById("from_amount").value * 10 ** currentTrade.from.decimals);
+  let d=new BigNumber(10).pow(currentTrade.from.decimals);
+  let amount=  new BigNumber(Number(document.getElementById("from_amount").value)).multipliedBy(d);
+  console.log("Amount: ",amount.toFixed());
   const params = {
     sellToken: currentTrade.from.address,
     buyToken: currentTrade.to.address,
-    sellAmount: amount,
+    sellAmount: amount.toFixed(),
     // Set takerAddress to account 
     takerAddress: account,
   }
