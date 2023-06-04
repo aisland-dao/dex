@@ -6,10 +6,16 @@ const qs=require("qs");
 let mysql = require('mysql2/promise');
 
 let app = express();
+// get API KEY for 0x.0rg
 const APIKEY = process.env.APIKEY
-// set default to local host if not set
 if (typeof APIKEY === 'undefined') {
     console.log(Date.now(), "[Error] the environment variable APIKEY is not set.");
+    process.exit(1);
+}
+// get API KEY for Coinmarketcap.com
+const COINMARKETCAPAPIKEY=process.env.COINMARKETCAPAPIKEY; //optional
+if (typeof COINMARKETCAPAPIKEY=== 'undefined') {
+    console.log(Date.now(), "[Error] the environment variable COINMARKETCAPAPIKEY is not set.");
     process.exit(1);
 }
 const DB_HOST = process.env.DB_HOST
@@ -18,6 +24,7 @@ const DB_USER = process.env.DB_USER
 const DB_PWD = process.env.DB_PWD
 const WALLET = process.env.WALLET
 const FEES=process.env.FEES;
+
 // set default to local host if not set
 if (typeof DB_HOST === 'undefined') {
     console.log(Date.now(), "[Error] the environment variable DB_HOST is not set.");
@@ -45,6 +52,7 @@ if (typeof FEES=== 'undefined') {
     console.log(Date.now(), "[Error] the environment variable FEES is not set.");
     process.exit(1);
 }
+
 console.log("Dex Server - v.1.00");
 console.log("Listening on port tcp/3000 ....");
 mainloop();
@@ -163,7 +171,47 @@ async function mainloop(){
            return;
         }
     });
-
+    //function to get the token metadata, it's cached for 1 week since it's quite static
+    app.get('/tokenmetadata',async function (req, res) {
+       let token=req.query.token;
+       if(typeof token === 'undefined') {
+          res.send('{"error":"token parameter is missing"}');
+          return;
+       }
+       // search the token for chainid 1 - Etheurum
+        const [rows, fields] = await connection.execute('select *  from tokens where chainid=1 and symbol=?',[token]);
+        if(rows.length===0){
+           res.send('{"error":"token not found"}');
+           return;
+        }
+        let usecache=false;
+        // check for cache data
+        if(rows[0].metadata !== null){
+             let j=JSON.parse(rows[0].metadata);
+             let lastupdate= new Date(j.status.timestamp);
+             let currentdate= new Date();
+             let days= await getDaysDifference(lastupdate,currentdate);
+             if(days<7)
+              usecache=true;
+        }
+        if(usecache==false){
+           //fetch metadata from coinmarketcap
+           const response = await fetch(`https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?address=${rows[0].address}`,{method: 'GET',headers:{"X-CMC_PRO_API_KEY":COINMARKETCAPAPIKEY}});
+           const metadata = await  response.json();       
+           // send back the metadata
+           res.send(metadata);
+           // store the metadata in the database
+           connection.execute("update tokens set metadata=? where symbol=? and chainid=1",[JSON.stringify(metadata),token]);
+           console.log("fetched data from coinmarketcap");
+           return;
+        }
+        else {
+           // send cache data
+           res.send(rows[0].metadata);
+        }
+    
+    });
+    
     // get files from html folder
     app.use(express.static('html'));
 
@@ -175,9 +223,17 @@ async function get_api_endpoint(chainId){
     if(typeof chainId=='undefined' || chainId==0x1){
        return("https://api.0x.org/swap/v1/");
     }
+    // Goerli Ethereum
+    if(chainId==0x5){
+       return("https://goerli.api.0x.org/swap/v1/");
+    }
     // polygon
     if(chainId==0x89){
        return("https://polygon.api.0x.org/swap/v1/");
+    }
+    // Mumbai polygon
+    if(chainId==0x13881){
+       return("https://mumbai.api.0x.org/swap/v1/");
     }
     // Binance Smart Chain
     if(chainId==0x38){
@@ -205,3 +261,19 @@ async function get_api_endpoint(chainId){
     }
     
 }
+// function to compute the difference between 2 dates in days
+function getDaysDifference(date1, date2) {
+  // Get the time values in milliseconds
+  const time1 = date1.getTime();
+  const time2 = date2.getTime();
+
+  // Calculate the difference in milliseconds
+  const diffInMs = Math.abs(time2 - time1);
+
+  // Convert milliseconds to days
+  const msInDay = 1000 * 60 * 60 * 24;
+  const diffInDays = Math.floor(diffInMs / msInDay);
+
+  return diffInDays;
+}
+
