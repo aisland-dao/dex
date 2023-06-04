@@ -383,8 +383,12 @@ async function show_blockchain_name(){
   let b=" from unsupported network ("+chainId.toString()+")";
   if(chainId==0x1)
     b="from Ethereum";
+  if(chainId==0x5)
+    b="from Goerli Ethereum";
   if(chainId==0x89)
     b="from Polygon";
+  if(chainId==0x13881)
+    b="from Mumbai Polygon";    
   if(chainId==0x38)
     b="from BSC";  
   if(chainId==0xa)
@@ -453,13 +457,16 @@ async  function  getPrice(){
   // Only fetch price if from token, to token, and from token amount have been filled in 
   if (!currentTrade.from || !currentTrade.to || !document.getElementById("from_amount").value) return;
     // The amount is calculated from the smallest base unit of the token. We get this by multiplying the (from amount) x (10 to the power of the number of decimal places)
-  let  amount = Number(document.getElementById("from_amount").value * 10 ** currentTrade.from.decimals);
+  //let  amount = Number(document.getElementById("from_amount").value * 10 ** currentTrade.from.decimals);
+  let d=new BigNumber(10).pow(currentTrade.from.decimals);
+  let amount=  new BigNumber(Number(document.getElementById("from_amount").value)).multipliedBy(d);
   console.log("from_amount ",document.getElementById("from_amount").value);
   console.log("currentTrade.from.decimals ",currentTrade.from.decimals);
+  console.log("amount: ",amount.toFixed());
   const params = {
     sellToken: currentTrade.from.address,
     buyToken: currentTrade.to.address,
-    sellAmount: amount,
+    sellAmount: amount.toFixed(),
   }
   document.getElementById('message').innerHTML='';
   // Fetch the swap price.
@@ -559,7 +566,11 @@ async function getpriceusd(){
   let t;
   if(chainId==0x1)
     t="ETH";
+  if(chainId==0x5)
+    t="ETH";    
   if(chainId==0x89)
+    t="MATIC";
+  if(chainId==0x13881)
     t="MATIC";
   if(chainId==0x38)
     t="BNB";  
