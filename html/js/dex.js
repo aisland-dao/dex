@@ -172,8 +172,8 @@ function renderInterface(){
     document.getElementById("from_token_img").src = currentTrade.from.logouri;
      // Set the from token symbol text
     document.getElementById("from_token_text").innerHTML = currentTrade.from.symbol;
-    //show the tokens metadata if available
-    render_tokensmetadata([document.getElementById("from_token_text").innerText,document.getElementById("to_token_text").innerText]);
+   // //show the tokens metadata if available
+   // render_tokensmetadata([document.getElementById("from_token_text").innerText,document.getElementById("to_token_text").innerText]);
   }
   if (currentTrade.to) {
       // Set the to token image
@@ -181,7 +181,13 @@ function renderInterface(){
       // Set the to token symbol text
     document.getElementById("to_token_text").innerHTML = currentTrade.to.symbol;
     //show the tokens metadata if available
-    render_tokensmetadata([document.getElementById("to_token_text").innerText,document.getElementById("from_token_text").innerText]);
+   /// render_tokensmetadata([document.getElementById("to_token_text").innerText,document.getElementById("from_token_text").innerText]);
+  }
+  if(currentSelectSide=="from"){
+    //show the tokens metadata if available
+    render_tokensmetadata([document.getElementById("from_token_text").innerText,document.getElementById("to_token_text").innerText]);
+  }else {
+    render_tokensmetadata([document.getElementById("to_token_text").innerText,document.getElementById("from_token_text").innerText]);  
   }
   //udpate the price
   getPrice();
