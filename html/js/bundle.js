@@ -440,15 +440,20 @@ function renderInterface(){
     document.getElementById("from_token_img").src = currentTrade.from.logouri;
      // Set the from token symbol text
     document.getElementById("from_token_text").innerHTML = currentTrade.from.symbol;
+    //show the tokens metadata if available
+    render_tokensmetadata([document.getElementById("from_token_text").innerText,document.getElementById("to_token_text").innerText]);
   }
   if (currentTrade.to) {
       // Set the to token image
     document.getElementById("to_token_img").src = currentTrade.to.logouri;
       // Set the to token symbol text
     document.getElementById("to_token_text").innerHTML = currentTrade.to.symbol;
+    //show the tokens metadata if available
+    render_tokensmetadata([document.getElementById("to_token_text").innerText,document.getElementById("from_token_text").innerText]);
   }
-  //udpate the price eventually
+  //udpate the price
   getPrice();
+
 }
 
 // funnction to get best price for swapping
@@ -590,7 +595,62 @@ async function getpriceusd(){
   let response = await fetch('https://dex.aisland.io/priceusd?token='+t);
   let j = await response.json();
   return(j['price']);
-
+} 
+// function to render to tokens metadata
+async function render_tokensmetadata(tokens){
+ console.log(tokens);
+ let c='<div class="jumbotron">';
+ for (i in tokens){
+  // check for valid symbol
+  if(tokens[i]=="To Token" || tokens[i]=="From Token")
+    continue;
+  // fetch metadata
+  let response = await fetch('https://dex.aisland.io/tokenmetadata?token='+tokens[i]);
+  let md = await response.json();
+  // check for valid metadata
+  if(typeof md.status ==='undefined')
+   continue;
+  // build a table with the metadata
+  let k=Object.values(md.data)[0];
+  c=c+'<table class="table table-striped-columns table-responsive-sm">' ;
+  c=c+"<tr><td>Name</td><td>"+k.name+'&nbsp;&nbsp;<img src="'+k.logo+'" width="50"></td></tr>';  
+  c=c+'<tr><td>Description</td><td>'+k.description+'</td></tr>';  
+  c=c+"<tr><td>More info</td><td>";
+  if(typeof k.urls.website[0] != 'undefined'){
+   if(k.urls.website[0].length>0)
+       c=c+'<a href="'+k.urls.website[0]+'"><img src="images/web.png"></a>';  
+  }
+  if(typeof k.urls.twitter[0] != 'undefined'){
+   if(k.urls.twitter[0].length>0)
+       c=c+'&nbsp;<a href="'+k.urls.twitter[0]+'"><img src="images/twitter.png"></a>';  
+  }
+  if(typeof k.urls.facebook[0] != 'undefined'){
+   if(k.urls.facebook[0].length>0)
+       c=c+'&nbsp;<a href="'+k.urls.facebook[0]+'"><img src="images/facebook.png"></a>';  
+  }  
+  if(typeof k.urls.reddit[0] != 'undefined'){
+   if(k.urls.reddit[0].length>0)
+       c=c+'&nbsp;<a href="'+k.urls.reddit[0]+'"><img src="images/reddit.png"></a>';  
+  }
+  if(typeof k.urls.source_code[0] != 'undefined'){
+   if(k.urls.source_code[0].length>0)
+       c=c+'&nbsp;<a href="'+k.urls.source_code[0]+'"><img src="images/github.png"></a>';  
+  }
+  if(typeof k.urls.chat[0] != 'undefined'){
+   if(k.urls.chat[0].length>0)
+       c=c+'&nbsp;<a href="'+k.urls.chat[0]+'"><img src="images/chat.png"></a>';  
+  }
+  if(typeof k.urls.explorer[0] != 'undefined'){
+   if(k.urls.explorer[0].length>0)
+       c=c+'&nbsp;<a href="'+k.urls.explorer[0]+'"><img src="images/explorer.png"></a>';  
+  }
+  //console.log(k);
+  
+  
+  c=c+"</table>";
+ }
+ c=c+'</div>';
+ document.getElementById("tokenmetadata").innerHTML=c;
 }
 },{"bignumber.js":5,"qs":17,"web3":22}],5:[function(require,module,exports){
 ;(function (globalObject) {
