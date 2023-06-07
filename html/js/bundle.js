@@ -620,7 +620,9 @@ async function render_tokensmetadata(tokens){
   let k=Object.values(md.data)[0];
   c=c+'<table class="table table-striped-columns table-responsive-sm">' ;
   c=c+"<tr><td>Name</td><td>"+k.name+'&nbsp;&nbsp;<img src="'+k.logo+'" width="50"></td></tr>';  
-  c=c+'<tr><td>Description</td><td>'+k.description+'</td></tr>';  
+  // add a space after the first 'and'
+  d=k.description.replace("and"," and");
+  c=c+'<tr><td>Description</td><td>'+d+'</td></tr>';  
   c=c+"<tr><td>More info</td><td>";
   if(typeof k.urls.website[0] != 'undefined'){
    if(k.urls.website[0].length>0)
