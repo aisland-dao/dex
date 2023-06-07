@@ -3,15 +3,39 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Aisland - Crosschain Dex - Privacy Policy</title>
+
+    <title>Aisland - Crosschain Dex - Privacy</title>
+    <script src="/js/web3.min.js"></script>
     <script src="/js/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
+    <link href="/css/select2.min.css" rel="stylesheet" />
+    <script src="/js/select2.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#"><img src="logo_dex.png"></a>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+          <div class="dropdown">
+            <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Info
+            </a>
+            &nbsp; 
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <a class="dropdown-item" href="https://github.com/aisland-dao/dex">Source Code</a>
+              <a class="dropdown-item" href="auditings.html">Auditings</a>
+              <a class="dropdown-item" href="privacy.html">Privacy</a>
+              <a class="dropdown-item" href="terms_of_use.html">Terms of Use</a>
+              <a class="dropdown-item" href="https://metamask.io">Metamask</a>
+              <a class="dropdown-item" href="mailto:admin@aisland.io">Contact us</a>
+            </div>
+          </div>
+          </li>
+          <li class="nav-item">
+            <button id="login_button" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Connect Wallet</button>
+          </li>
       </nav>
       <div class ="container">
         <div class="row">
@@ -23,8 +47,10 @@
                       <p><li>We DO NOT store any information</li></p>
                       <p><li>We DO NOT set any cookie in your browser</li></p>
                       <p><li>We DO NOT log your ip address</li></p>                      
-                      <p><li>We DO NOT ask any registration/signup</li></p>                      
-                      Yes, we are the best :)
+                      <p><li>We DO NOT ask any registration/signup</li></p>              
+                      <p><li>This platform is open source and you can <a
+                      href="https://github.com/aisland-dao/dex">install</a> in your own
+                      computer.</li></p>
                       <p class="lead">
                         <a class="btn btn-primary btn-lg" href="/" role="button">back</a>
                       </p>
