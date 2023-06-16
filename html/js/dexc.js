@@ -38,8 +38,7 @@ async  function  connect() {
 
 // load the tokens
 async function listAvailableTokens(){
-  let url = window.location.protocol + "//" + window.location.host+"/tokens";
-  let response = await fetch(url);
+  let response = await fetch('https://dex.aisland.io/tokens');
   tokens = await response.json();
   await filterTokens("");
   
@@ -216,8 +215,7 @@ async  function  getPrice(){
   }
   document.getElementById('message').innerHTML='';
   // Fetch the swap price.
-  let url = window.location.protocol + "//" + window.location.host+"/price";
-  const response = await fetch(url+`?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':'ef2f16cd-2ff8-46d7-8132-acbaa16d0a34'},},);
+  const response = await fetch(`https://dex.aisland.io/price?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':'ef2f16cd-2ff8-46d7-8132-acbaa16d0a34'},},);
   swapPriceJSON = await  response.json();
   console.log("Price: ", swapPriceJSON);
   // in case of error
@@ -256,8 +254,7 @@ async function getQuote(account){
   }
   //console.log("params: ",params);
   // Fetch the swap quote.
-  let url = window.location.protocol + "//" + window.location.host+"/quote";
-  const response = await fetch(url+`?${qs.stringify(params)}`);
+  const response = await fetch(`https://dex.aisland.io/quote?${qs.stringify(params)}`);
   swapQuoteJSON = await response.json();
   console.log("Quote: ", swapQuoteJSON);
   
@@ -335,8 +332,7 @@ async function getpriceusd(){
   if(chainId==0xa4b1)
     t="ETH";        
   // fetch price from our API server
-  let url = window.location.protocol + "//" + window.location.host+"/priceusd";
-  let response = await fetch(url+'?token='+t);
+  let response = await fetch('https://dex.aisland.io/priceusd?token='+t);
   let j = await response.json();
   return(j['price']);
 } 
@@ -349,8 +345,7 @@ async function render_tokensmetadata(tokens){
   if(tokens[i]=="To Token" || tokens[i]=="From Token")
     continue;
   // fetch metadata
-  let url = window.location.protocol + "//" + window.location.host+"/tokenmetadata";
-  let response = await fetch(url+'?token='+tokens[i]);
+  let response = await fetch('https://dex.aisland.io/tokenmetadata?token='+tokens[i]);
   let md = await response.json();
   // check for valid metadata
   if(typeof md.status ==='undefined')
