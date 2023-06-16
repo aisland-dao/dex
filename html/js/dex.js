@@ -1,9 +1,18 @@
 // requirement for the x0 protocol call
 const  qs = require('qs');
+//import qs from 'qs';
 const BigNumber = require('bignumber.js');
+//import BigNumber from 'bignumber.js';
 const web3 = require('web3');
-//let ReactDOM = require('react-dom');
-//let React = require('react');
+//import web3 from 'web3';
+// requested from connectkit
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { WagmiConfig, createConfig } from 'wagmi';
+import { mainnet, polygon, celo,fantom,avalanche,bsc,optimism, arbitrum,goerli } from 'wagmi/chains';
+import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
+import { ConnectKitButton } from 'connectkit';
+import { useAccount } from "wagmi";
 // global vars
 let  currentTrade = {};
 let  currentSelectSide;
@@ -14,6 +23,7 @@ async  function  connect() {
 // Check if MetaMask is installed, if it is, try connecting to an account
     if (typeof  window.ethereum !== "undefined") {
         try {
+  
             console.log("connecting");
             // Requests that the user provides an Ethereum address to be identified by. The request causes a MetaMask popup to appear. Read more: https://docs.metamask.io/guide/rpc-api.html#eth-requestaccounts
             await  ethereum.request({ method:  "eth_requestAccounts" });
@@ -79,7 +89,7 @@ async function filterTokens(){
     parent.appendChild(div);
   }
 }
-// main body called a the loading
+// main body called at the loading
 // load the tokens immediately
 listAvailableTokens();
 // Call the connect function when the login_button is clicked
@@ -96,6 +106,8 @@ const search_token = document.getElementById("search_token");
 search_token.addEventListener("input", filterTokens);
 // render the blockchain name
 show_blockchain_name();
+// render connectkit button
+render_connectkit();
 // listen for change of the blockchain and reaload in casen
 if (typeof  window.ethereum !== "undefined")
   window.ethereum.on('chainChanged', (chainId) => window.location.reload());
@@ -170,7 +182,7 @@ function  selectToken(token) {
 // Function to display the image and token symbols 
 function renderInterface(){
   if (currentTrade.from) {
-    console.log(currentTrade.from)
+    //console.log(currentTrade.from)
     // Set the from token image
     document.getElementById("from_token_img").src = currentTrade.from.logouri;
      // Set the from token symbol text
@@ -218,7 +230,7 @@ async  function  getPrice(){
   // Fetch the swap price.
   let url = window.location.protocol + "//" + window.location.host+"/price";
   const response = await fetch(url+`?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':'ef2f16cd-2ff8-46d7-8132-acbaa16d0a34'},},);
-  swapPriceJSON = await  response.json();
+  let swapPriceJSON = await  response.json();
   console.log("Price: ", swapPriceJSON);
   // in case of error
   if(typeof swapPriceJSON.code !== 'undefined'){
@@ -258,13 +270,13 @@ async function getQuote(account){
   // Fetch the swap quote.
   let url = window.location.protocol + "//" + window.location.host+"/quote";
   const response = await fetch(url+`?${qs.stringify(params)}`);
-  swapQuoteJSON = await response.json();
+  let swapQuoteJSON = await response.json();
   console.log("Quote: ", swapQuoteJSON);
   
   document.getElementById("to_amount").value = swapQuoteJSON.buyAmount / (10 ** currentTrade.to.decimals);
   let priceusd=await getpriceusd();
-  let gasusd=swapPriceJSON.estimatedGas*swapPriceJSON.gasPrice/1000000000000000000*priceusd;
-  document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas.toString()+"( "+gasusd.toFixed(2).toString()+" USD)";
+  let gasusd=swapQuoteJSON.estimatedGas*swapQuoteJSON.gasPrice/1000000000000000000*priceusd;
+  document.getElementById("gas_estimate").innerHTML = swapQuoteJSON.estimatedGas.toString()+"( "+gasusd.toFixed(2).toString()+" USD)";
   return swapQuoteJSON;
 }
 //function to to perform the Swap (it may fail)
@@ -280,6 +292,7 @@ async  function  trySwap(){
   console.log("takerAddress: ", takerAddress);
   // Pass this as the account param into getQuote() we built out earlier. This will return a JSON object trade order. 
   const  swapQuoteJSON = await  getQuote(takerAddress);
+  console.log(swapQuoteJSON);
   // Setup the erc20abi in json format so we can interact with the approve method below
   const erc20abi= [{ "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "symbol", "type": "string" }, { "internalType": "uint256", "name": "max_supply", "type": "uint256" } ], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "spender", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "from", "type": "address" }, { "indexed": true, "internalType": "address", "name": "to", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" } ], "name": "allowance", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "approve", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" } ], "name": "balanceOf", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "burn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "burnFrom", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "decimals", "outputs": [ { "internalType": "uint8", "name": "", "type": "uint8" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "subtractedValue", "type": "uint256" } ], "name": "decreaseAllowance", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "addedValue", "type": "uint256" } ], "name": "increaseAllowance", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "name", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "symbol", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "totalSupply", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transfer", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }]
   // Set up approval amount for the token we want to trade from
@@ -294,7 +307,7 @@ async  function  trySwap(){
   const maxApproval=new BigNumber(swapQuoteJSON.sellAmount);
   console.log("approval amount: ", maxApproval);
   // Grant the allowance target (the 0x Exchange Proxy) an  allowance to spend our tokens. Note that this is a txn that incurs fees. 
-  const tx = await ERC20TokenContract.methods.approve(swapQuoteJSON.allowanceTarget,maxApproval,)
+  const tx = await ERC20TokenContract.methods.approve(swapQuoteJSON.allowanceTarget,swapQuoteJSON.sellAmount,)
   .send({ from: takerAddress })
   .then(tx => {
     console.log("tx: ", tx)
@@ -344,6 +357,7 @@ async function getpriceusd(){
 async function render_tokensmetadata(tokens){
  console.log(tokens);
  let c='<div class="jumbotron">';
+ let i=0;
  for (i in tokens){
   // check for valid symbol
   if(tokens[i]=="To Token" || tokens[i]=="From Token")
@@ -360,7 +374,7 @@ async function render_tokensmetadata(tokens){
   c=c+'<table class="table table-striped-columns table-responsive-sm">' ;
   c=c+"<tr><td>Name</td><td>"+k.name+'&nbsp;&nbsp;<img src="'+k.logo+'" width="50"></td></tr>';  
   // add a space after the first 'and'
-  d=k.description.replace("and"," and");
+  let d=k.description.replace("and"," and");
   c=c+'<tr><td>Description</td><td>'+d+'</td></tr>';  
   c=c+"<tr><td>More info</td><td>";
   if(typeof k.urls.website[0] != 'undefined'){
@@ -398,4 +412,77 @@ async function render_tokensmetadata(tokens){
  c=c+'</div>';
  document.getElementById("tokenmetadata").innerHTML=c;
 }
+// function to render the connectkit button
+async function render_connectkit(){
+  const config = createConfig(
+   getDefaultConfig({
+    appName: 'Aisland dex',
+    infuraId: '58ea4b33a1fc4534bb1d8e2983e51993',
+    chains: [mainnet, polygon, celo,fantom,avalanche,bsc,optimism,arbitrum,goerli],
+    walletConnectProjectId: '243a2d7fcdff36a840b899d68a4c9eed'
+   })
+  );
+  const root = ReactDOM.createRoot(
+     document.getElementById('mainbutton') // as HTMLElement
+   );
+   
+   root.render(
+     <React.StrictMode>
+       <WagmiConfig config={config}>
+        <ConnectKitProvider options={{showBalance:true}}>
+         <App />
+        </ConnectKitProvider>
+      </WagmiConfig>
+     </React.StrictMode>
+   );
+   
+   const status = ReactDOM.createRoot(
+     document.getElementById('status') 
+   );
 
+   status.render(
+     <React.StrictMode>
+     <WagmiConfig config={config}>
+        <ConnectKitProvider>
+        <ShowStatus />
+        </ConnectKitProvider>
+     </WagmiConfig>
+     </React.StrictMode>
+   );
+   
+}
+// function to render the wallet connect button
+function App() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '5vh',
+      }}
+    >
+      <ConnectKitButton />
+    </div>
+  );
+}
+// function to show the updated status of the wallet/account
+function ShowStatus(){
+  const { address, isConnecting, isDisconnected } = useAccount();
+  if (isConnecting){
+   document.getElementById("status").hidden = false;   
+   return <div>Connecting...</div>;
+  }
+  if (isDisconnected){
+    document.getElementById("swap_button").disabled = true;   
+    document.getElementById("swap_button").hidden = true;   
+    document.getElementById("status").hidden = false;   
+    return <div>Disconnected</div>;
+  }
+  // in case of "connected" status
+  connect();
+  document.getElementById("swap_button").disabled = false;
+  document.getElementById("swap_button").hidden = false;   
+  document.getElementById("status").hidden = true;   
+  return <div>Connected Wallet: {address}</div>;
+}
