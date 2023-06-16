@@ -124,10 +124,11 @@ You can leave our wallet if you wish to contribute to our efforts or place yours
   
 Remember to execute:  
 ```bash
-/usr/srd/dex/build-bundle.sh
+cd /usr/src/dex/react/
+./build.sh
 to update the bundle.js
 ```
-if you change dex.js, since it's bundled together with some libraries.
+if you change dex.js, since it's bundled together with some open source libraries.
 
 
 ## Contribution  
