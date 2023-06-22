@@ -54,7 +54,7 @@ if (typeof FEES=== 'undefined') {
 }
 
 console.log("Dex Server - v.1.00");
-console.log("Listening on port tcp/3000 ....");
+console.log("Listening on port tcp/3001 ....");
 mainloop();
 // main body
 async function mainloop(){
@@ -92,6 +92,18 @@ async function mainloop(){
     // get quote from 0x protocol (booking the funds of the liquidity provider)
     app.get('/quote',async function (req, res) {
        // forward parameters received
+       
+       // check then slippage
+       let slippage=0.01;
+       if(typeof req.query.slippagePercentage !== 'undefined'){
+         if(req.query.slippagePercentage>1)
+           slippage=1;
+         if(req.query.slippagePercentage<0)
+           slippage=0;
+         if(req.query.slippagePercentage>=0 && req.query.slippagePercentage<=1){
+           slippage=req.query.slippagePercentage;
+         }
+       }
        const params = {
          sellToken: req.query.sellToken,
          buyToken: req.query.buyToken,
@@ -99,9 +111,10 @@ async function mainloop(){
          //takerAddress: req.query.takerAddress,
          buyTokenPercentageFee: FEES,
          feeRecipient: WALLET,
-         affiliateAddress: WALLET
+         affiliateAddress: WALLET,
+         slippagePercentage:slippage
        }
-       //console.log("params ",params);
+       console.log("params ",params);
        let chainId=req.query.chainId;
        const endpoint= await get_api_endpoint(chainId);
        // Fetch the swap price.
@@ -171,7 +184,7 @@ async function mainloop(){
            return;
         }
     });
-    //function to get the token metadata, it's cached for 1 week since it's quite static
+    //function to get the token metadata, it's cached for 1 day 
     app.get('/tokenmetadata',async function (req, res) {
        let token=req.query.token;
        if(typeof token === 'undefined') {
@@ -191,7 +204,7 @@ async function mainloop(){
              let lastupdate= new Date(j.status.timestamp);
              let currentdate= new Date();
              let days= await getDaysDifference(lastupdate,currentdate);
-             if(days<7)
+             if(days<1)
               usecache=true;
         }
         if(usecache==false){

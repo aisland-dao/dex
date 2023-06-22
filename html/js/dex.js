@@ -9,7 +9,7 @@ const web3 = require('web3');
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WagmiConfig, createConfig } from 'wagmi';
-import { mainnet, polygon, celo,fantom,avalanche,bsc,optimism, arbitrum,goerli } from 'wagmi/chains';
+import { mainnet, polygon, celo,fantom,avalanche,bsc,optimism, arbitrum,goerli,polygonMumbai } from 'wagmi/chains';
 import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
 import { ConnectKitButton } from 'connectkit';
 import { useAccount } from "wagmi";
@@ -259,12 +259,21 @@ async function getQuote(account){
   let d=new BigNumber(10).pow(currentTrade.from.decimals);
   let amount=  new BigNumber(Number(document.getElementById("from_amount").value)).multipliedBy(d);
   console.log("Amount: ",amount.toFixed());
+  let slippage=0.0;
+  slippage=document.getElementById("slippagePercentage").value;
+  if(slippage<0)
+   slippage=0.0;
+  if(slippage>100)
+   slippage=100;
+  if(slippage>0)
+   slippage=slippage/100;
   const params = {
     sellToken: currentTrade.from.address,
     buyToken: currentTrade.to.address,
     sellAmount: amount.toFixed(),
     // Set takerAddress to account 
     takerAddress: account,
+    slippagePercentage: slippage
   }
   //console.log("params: ",params);
   // Fetch the swap quote.
@@ -418,7 +427,7 @@ async function render_connectkit(){
    getDefaultConfig({
     appName: 'Aisland dex',
     infuraId: '58ea4b33a1fc4534bb1d8e2983e51993',
-    chains: [mainnet, polygon, celo,fantom,avalanche,bsc,optimism,arbitrum,goerli],
+    chains: [mainnet, polygon, celo,fantom,avalanche,bsc,optimism,arbitrum,goerli,polygonMumbai],
     walletConnectProjectId: '243a2d7fcdff36a840b899d68a4c9eed'
    })
   );

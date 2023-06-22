@@ -65,6 +65,18 @@
                             <input disabled class="number form-control" placeholder="amount" id="to_amount">
                         </div>
                     </div>  
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="slippagePercentage" class="col-form-label">Max. % Slippage</label></div>
+                        <div class="col-auto">
+                          <input type="number" id="slippagePercentage" class="number form-control w-50" aria-labelledby="slippageHelp" value="1">
+                        </div>
+                        <div class="col-auto">
+                          <span id="slippageHelp" class="form-text">
+                            Min. 0 - Max. 100
+                          </span>
+                        </div>
+                    </div>
                     <div class="gas_estimate_label">Estimated Gas: <span id="gas_estimate"></span></div>
                     <button class="btn btn-large btn-primary btn-block" id="swap_button" hidden >Swap</button>                
                     <!-- <div id="mainbutton"></id> -->
