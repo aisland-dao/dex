@@ -18,7 +18,9 @@ let  currentTrade = {};
 let  currentSelectSide;
 let tokens;
 let connected=false;
-
+let CHAINID=0;
+let chainExplorer="";
+let allowanceTarget=0x0;
 async  function  connect() {
 // Check if MetaMask is installed, if it is, try connecting to an account
     if (typeof  window.ethereum !== "undefined") {
@@ -48,7 +50,8 @@ async  function  connect() {
 
 // load the tokens
 async function listAvailableTokens(){
-  let url = window.location.protocol + "//" + window.location.host+"/tokens";
+  let url = window.location.protocol + "//" + window.location.host+"/tokens?chainId="+CHAINID;
+  console.log(url);
   let response = await fetch(url);
   tokens = await response.json();
   await filterTokens("");
@@ -90,6 +93,8 @@ async function filterTokens(){
   }
 }
 // main body called at the loading
+// render the blockchain name
+await show_blockchain_name();
 // load the tokens immediately
 listAvailableTokens();
 // Call the connect function when the login_button is clicked
@@ -104,8 +109,7 @@ document.getElementById("to_token_select").onclick = () => {
 // search tokens event
 const search_token = document.getElementById("search_token");
 search_token.addEventListener("input", filterTokens);
-// render the blockchain name
-show_blockchain_name();
+
 // render connectkit button
 render_connectkit();
 // listen for change of the blockchain and reaload in casen
@@ -125,29 +129,50 @@ async function show_blockchain_name(){
     console.log(e);
     return;
   }
+  CHAINID=chainId;
   // set the title
   let m="<H4>Swap";
   let b=" from unsupported network ("+chainId.toString()+")";
-  if(chainId==0x1)
+  if(chainId==0x1){
     b="from Ethereum";
-  if(chainId==0x5)
+    chainExplorer="https://etherscan.io/tx/"
+  }
+  if(chainId==0x5){
     b="from Goerli Ethereum";
-  if(chainId==0x89)
+    chainExplorer="https://goerli.therscan.io/tx/"
+  }
+  if(chainId==0x89){
     b="from Polygon";
-  if(chainId==0x13881)
+    chainExplorer="https://polygonscan.com/tx/"
+  }
+  if(chainId==0x13881){
     b="from Mumbai Polygon";    
-  if(chainId==0x38)
+    chainExplorer="https://mumbai.polygonscan.com/tx/"
+ }
+  if(chainId==0x38){
     b="from BSC";  
-  if(chainId==0xa)
-    b="from Optimism";      
-  if(chainId==0xfa)
+    chainExplorer="https://bscscan.com/tx/";
+ }
+  if(chainId==0xa){
+    b="from Optimistic";      
+    chainExplorer="https://optimistic.etherscan.io/tx/";
+  }
+  if(chainId==0xfa){
     b="from Fantom";    
-  if(chainId==0xa4ec)
-    b="from Celo";        
-  if(chainId==0xa86a)
+    chainExplorer="https://ftmscan.com/tx/";
+  }
+  if(chainId==0xa4ec){
+    b="from Celo";    
+    chainExplorer="https://celoscan.io/tx/";
+  }    
+  if(chainId==0xa86a){
     b="from Avalanche";        
-  if(chainId==0xa4b1)
+    chainExplorer="https://snowtrace.io/tx/";
+  }
+  if(chainId==0xa4b1){
     b="from Arbitrum";        
+    chainExplorer="https://arbiscan.io/tx/";
+  }
   m+=" "+b+"</H4>";
   document.getElementById("blockchain").innerHTML = m;
 
@@ -225,6 +250,7 @@ async  function  getPrice(){
     sellToken: currentTrade.from.address,
     buyToken: currentTrade.to.address,
     sellAmount: amount.toFixed(),
+    chainId: CHAINID
   }
   document.getElementById('message').innerHTML='';
   // Fetch the swap price.
@@ -248,6 +274,9 @@ async  function  getPrice(){
   let priceusd=await getpriceusd();
   let gasusd=swapPriceJSON.estimatedGas*swapPriceJSON.gasPrice/1000000000000000000*priceusd;
   document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas.toString()+"( "+gasusd.toFixed(2).toString()+" USD)";
+  // set global variable for target allowance
+  allowanceTarget=swapPriceJSON.allowanceTarget;
+  return;
 
 }
 // Function to get a quote from the protocol
@@ -273,15 +302,26 @@ async function getQuote(account){
     sellAmount: amount.toFixed(),
     // Set takerAddress to account 
     takerAddress: account,
-    slippagePercentage: slippage
+    slippagePercentage: slippage,
+    chainId: CHAINID
   }
   //console.log("params: ",params);
   // Fetch the swap quote.
   let url = window.location.protocol + "//" + window.location.host+"/quote";
   const response = await fetch(url+`?${qs.stringify(params)}`);
   let swapQuoteJSON = await response.json();
-  console.log("Quote: ", swapQuoteJSON);
-  
+  console.log("Quote New: ", swapQuoteJSON);
+  // in case of error
+  if(typeof swapQuoteJSON.code !== 'undefined'){
+    let message='<div class="alert alert-danger" role="alert">Error: '+swapQuoteJSON.code.toString()+" - "+swapQuoteJSON.reason;
+    message=message+" - "+swapQuoteJSON.values.message;
+    message=message+'</div><hr>';
+    document.getElementById('message').innerHTML=message;
+    document.getElementById("to_amount").value=0;
+    return;
+  }
+  console.log("swapQuoteJSON.code",swapQuoteJSON.code);  
+  console.log("new");
   document.getElementById("to_amount").value = swapQuoteJSON.buyAmount / (10 ** currentTrade.to.decimals);
   let priceusd=await getpriceusd();
   let gasusd=swapQuoteJSON.estimatedGas*swapQuoteJSON.gasPrice/1000000000000000000*priceusd;
@@ -294,36 +334,58 @@ async  function  trySwap(){
     connect();
     return;
   }
+  document.getElementById("message").innerHTML ='<div class="d-flex justify-content-center"><div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status"> <span class="sr-only">Loading...</span></div></div>';
   // The address, if any, of the most recently used account that the caller is permitted to access
   let accounts = await ethereum.request({ method: "eth_accounts" });
   let takerAddress = accounts[0];
-  // Log the the most recently used address in our MetaMask wallet
-  console.log("takerAddress: ", takerAddress);
-  // Pass this as the account param into getQuote() we built out earlier. This will return a JSON object trade order. 
-  const  swapQuoteJSON = await  getQuote(takerAddress);
-  console.log(swapQuoteJSON);
+  // amount to sell
+  let d=new BigNumber(10).pow(currentTrade.from.decimals);
+  let amount=  new BigNumber(Number(document.getElementById("from_amount").value)).multipliedBy(d);
+  let sellAmount=amount.toFixed();
+  // In order for us to interact with a ERC20 contract's method's, need to create a web3 object. This web3.eth.Contract object needs a erc20abi which we can get from any erc20 abi as well as the specific token address we are interested in interacting with, in this case, it's the fromTokenAddrss
   // Setup the erc20abi in json format so we can interact with the approve method below
   const erc20abi= [{ "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "symbol", "type": "string" }, { "internalType": "uint256", "name": "max_supply", "type": "uint256" } ], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "spender", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "from", "type": "address" }, { "indexed": true, "internalType": "address", "name": "to", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" } ], "name": "allowance", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "approve", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" } ], "name": "balanceOf", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "burn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "burnFrom", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "decimals", "outputs": [ { "internalType": "uint8", "name": "", "type": "uint8" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "subtractedValue", "type": "uint256" } ], "name": "decreaseAllowance", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "addedValue", "type": "uint256" } ], "name": "increaseAllowance", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "name", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "symbol", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "totalSupply", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transfer", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }]
   // Set up approval amount for the token we want to trade from
   const fromTokenAddress = currentTrade.from.address;
-  // In order for us to interact with a ERC20 contract's method's, need to create a web3 object. This web3.eth.Contract object needs a erc20abi which we can get from any erc20 abi as well as the specific token address we are interested in interacting with, in this case, it's the fromTokenAddrss
-  // Read More: https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#web3-eth-contract
   const  web3 = new  Web3(Web3.givenProvider);
   const ERC20TokenContract = new web3.eth.Contract(erc20abi, fromTokenAddress);
   console.log("setup ERC20TokenContract: ", ERC20TokenContract);
-  // The max approval is set here. Using Bignumber to handle large numbers and account for overflow (https://github.com/MikeMcl/bignumber.js/)
-  //const maxApproval = new BigNumber(2).pow(256).minus(1);
-  const maxApproval=new BigNumber(swapQuoteJSON.sellAmount);
-  console.log("approval amount: ", maxApproval);
-  // Grant the allowance target (the 0x Exchange Proxy) an  allowance to spend our tokens. Note that this is a txn that incurs fees. 
-  const tx = await ERC20TokenContract.methods.approve(swapQuoteJSON.allowanceTarget,swapQuoteJSON.sellAmount,)
-  .send({ from: takerAddress })
-  .then(tx => {
-    console.log("tx: ", tx)
-  });
+  try{
+    // Grant the allowance target (the 0x Exchange Proxy) an  allowance to spend our tokens. Note that this is a txn that incurs fees. 
+    const tx = await ERC20TokenContract.methods.approve(allowanceTarget,sellAmount,)
+    .send({ from: takerAddress })
+    .then(tx => {
+     console.log("tx: ", tx)
+     });
+   }
+   catch(e){
+      let message='<div class="alert alert-danger" role="alert">Error: '+e.message;
+      message=message+'</div><hr>';
+      document.getElementById('message').innerHTML=message;
+      return;
+   }
+  // Log the the most recently used address in our MetaMask wallet
+  console.log("takerAddress: ", takerAddress);
+  // Pass this as the account param into getQuote() we built out earlier. This will return a JSON object trade order. 
+  const  swapQuoteJSON = await  getQuote(takerAddress);
+  //console.log(swapQuoteJSON);
+  //console.log("fromTokenAddress",fromTokenAddress);
+  //console.log("currentTrade",currentTrade);
+
   // Perform the swap
-  const  receipt = await  web3.eth.sendTransaction(swapQuoteJSON);
-  console.log("receipt: ", receipt);
+  try{
+    const  receipt = await  web3.eth.sendTransaction(swapQuoteJSON);
+    console.log("receipt: ", receipt);
+    //show the transaction hash
+    document.getElementById("message").innerHTML = 'Swap submitted... <a href="'+chainExplorer+receipt.transactionHash+'" target="_blank">View in explorer</a>';
+    return;
+  }
+  catch(e){
+      let message='<div class="alert alert-danger" role="alert">Error: '+e.message;
+      message=message+'</div><hr>';
+      document.getElementById('message').innerHTML=message;
+      return;
+  }
 }
 // function to show the get the price in USD of the native token of the selectet blockchain,for gas fees in USD.
 async function getpriceusd(){

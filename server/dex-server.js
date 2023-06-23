@@ -83,6 +83,8 @@ async function mainloop(){
        }
        let chainId=req.query.chainId;
        const endpoint= await get_api_endpoint(chainId);
+       console.log("endpoint",endpoint);
+       console.log("params",params);
        // Fetch the swap price.
        const response = await fetch(`${endpoint}price?${qs.stringify(params)}`,{method: 'GET',headers:{'0x-api-key':APIKEY},},);
        let swapPriceJSON = await  response.json();
@@ -108,7 +110,7 @@ async function mainloop(){
          sellToken: req.query.sellToken,
          buyToken: req.query.buyToken,
          sellAmount: req.query.sellAmount,
-         //takerAddress: req.query.takerAddress,
+         takerAddress: req.query.takerAddress,
          buyTokenPercentageFee: FEES,
          feeRecipient: WALLET,
          affiliateAddress: WALLET,
@@ -125,7 +127,13 @@ async function mainloop(){
     });
     // fetch tokens list
     app.get('/tokens',async function (req, res) {
-        const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens where chainid=1 order by ranking desc,symbol');
+        let chainIds=req.query.chainId;
+        let chainId=1;
+        if(typeof chainIds !== 'undefined'){
+            chainId=parseInt(chainIds);        
+        }
+        console.log("Tokens for chainid",chainId);
+        const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens where chainid=? order by ranking desc,symbol',[chainId]);
         //console.log(rows);
         res.send(JSON.stringify(rows));
     });
