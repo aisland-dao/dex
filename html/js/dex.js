@@ -210,6 +210,7 @@ function renderInterface(){
     //console.log(currentTrade.from)
     // Set the from token image
     document.getElementById("from_token_img").src = currentTrade.from.logouri;
+    document.getElementById("from_token_img").width=40;
      // Set the from token symbol text
     document.getElementById("from_token_text").innerHTML = currentTrade.from.symbol;
    // //show the tokens metadata if available
@@ -218,6 +219,7 @@ function renderInterface(){
   if (currentTrade.to) {
       // Set the to token image
     document.getElementById("to_token_img").src = currentTrade.to.logouri;
+    document.getElementById("to_token_img").width=40;
       // Set the to token symbol text
     document.getElementById("to_token_text").innerHTML = currentTrade.to.symbol;
     //show the tokens metadata if available
@@ -241,7 +243,7 @@ async  function  getPrice(){
   if (!currentTrade.from || !currentTrade.to || !document.getElementById("from_amount").value) return;
     // The amount is calculated from the smallest base unit of the token. We get this by multiplying the (from amount) x (10 to the power of the number of decimal places)
   //let  amount = Number(document.getElementById("from_amount").value * 10 ** currentTrade.from.decimals);
-  let d=new BigNumber(10).pow(currentTrade.from.decimals);
+  let  d=new BigNumber(10).pow(currentTrade.from.decimals);
   let amount=  new BigNumber(Number(document.getElementById("from_amount").value)).multipliedBy(d);
   //console.log("from_amount ",document.getElementById("from_amount").value);
   //console.log("currentTrade.from.decimals ",currentTrade.from.decimals);
@@ -334,6 +336,9 @@ async  function  trySwap(){
     connect();
     return;
   }
+  if (!currentTrade.from || !currentTrade.to || !document.getElementById("from_amount").value) 
+   return;
+  
   document.getElementById("message").innerHTML ='<div class="d-flex justify-content-center"><div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status"> <span class="sr-only">Loading...</span></div></div>';
   // The address, if any, of the most recently used account that the caller is permitted to access
   let accounts = await ethereum.request({ method: "eth_accounts" });
