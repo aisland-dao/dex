@@ -137,6 +137,12 @@ async function mainloop(){
         //console.log(rows);
         res.send(JSON.stringify(rows));
     });
+    // fetch best gas price
+    app.get('/bestgasprice',async function (req, res) {
+        const [rows, fields] = await connection.execute('select *,gwei*usdrate/1000000000 as gasprice from gasstation order by gasprice desc');
+        //console.log(rows);
+        res.send(JSON.stringify(rows[0]));
+    });
     // get token price in USD (for gas fees only, so only a few tokens are supported)
     app.get('/priceusd',async function (req, res) {
        let token=req.query.token;
