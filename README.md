@@ -9,6 +9,10 @@ This package is a Crosschain DEX that is supporting natively 8 different blockch
 - Avalanche 
 - Arbitrum
 
+![Hackaton Winner](https://github.com/aisland-dao/dex/blob/main/Winner%20-%20Aisland%20Dex.jpg)
+
+[official Results](https://dorahacks.io/hackathon/decreasing-frictions-in-defi/results)
+
 
 You can use the on-line version clicking here:  
 [https://dex.aisland.io](https://dex.aisland.io)  
