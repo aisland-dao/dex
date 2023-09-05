@@ -29,12 +29,13 @@
               <a class="dropdown-item" href="slippage_mev_protection.html">Slippage Protection</a>
               <a class="dropdown-item" href="privacy.html">Privacy</a>
               <a class="dropdown-item" href="terms_of_use.html">Terms of Use</a>
-              <a class="dropdown-item" target="_blank" href="https://support.aisland.io">Contact us</a>
+              <a class="dropdown-item" href="https://metamask.io">Metamask</a>
+              <a class="dropdown-item" href="mailto:admin@aisland.io">Contact us</a>
             </div>
           </div>
           </li>
           <li class="nav-item">
-            <a class="btn btn-outline-primary my-2 my-sm-0" href="https://news.aisland.io" role="button">News</a>
+            <button id="login_button" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Connect Wallet</button>
           </li>
       </nav>
       <div class ="container">
@@ -46,10 +47,7 @@
                         <div class="swapbox_select token_select" id="from_token_select">
                             <div  class="swapbox_select token_select"  id="from_token_select">
                                 <img  class="token_img"  id="from_token_img">
-                                <span  id="from_token_text">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16"><path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/></svg>
-                                From Token
-                                </span>
+                                <span  id="from_token_text">From Token</span>
                             </div>
                         </div>
                         <div class="swapbox_select">
@@ -59,35 +57,16 @@
                     <div class="swapbox">
                         <div class="swapbox_select token_select" id="to_token_select">
                             <div  class="swapbox_select token_select"  id="to_token_select">
-                                <img  class="token_img"  id="to_token_img" >
-                                <span  id="to_token_text">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16"><path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/></svg>
-                                To Token
-                                </span>
+                                <img  class="token_img"  id="to_token_img">
+                                <span  id="to_token_text">To Token</span>
                             </div>
                         </div>
                          <div class="swapbox_select">
                             <input disabled class="number form-control" placeholder="amount" id="to_amount">
                         </div>
                     </div>  
-                    <div class="row g-3 align-items-center">
-                        <div class="col-auto">
-                            <label for="slippagePercentage" class="col-form-label">Max. % Slippage</label></div>
-                        <div class="col-auto">
-                          <input type="number" id="slippagePercentage" class="number form-control w-50" aria-labelledby="slippageHelp" value="1">
-                        </div>
-                        <div class="col-auto">
-                          <span id="slippageHelp" class="form-text">
-                            Min. 0 - Max. 100
-                          </span>
-                        </div>
-                    </div>
-                    <div class="gas_estimate_label">Gas Fees: <span id="gas_estimate"></span></div>
-                    <button class="btn btn-large btn-primary btn-block" id="swap_button" hidden >Swap</button>                
-                    <!-- <div id="mainbutton"></id> -->
-                    <button class="btn btn-large btn-primary btn-block" id="mainbutton"></button>
-                    <!-- <div id="mainbutton"></id> -->
-                    <button class="btn btn-large btn-secondary btn-block" id="status"></button>
+                    <div class="gas_estimate_label">Estimated Gas: <span id="gas_estimate"></span></div>
+                    <button class="btn btn-large btn-primary btn-block" id="swap_button">Connect Wallet</button>                
                     <hr>
                     <div id="message"></div>
                     <div id="tokenmetadata"></div>
@@ -95,7 +74,7 @@
                     <div class="jumbotron">
                       <h2 class="display-8"><center>AISLAND DEX</center></h2>
                       <p class="lead">A unique CROSSCHAIN decentralised exchange that allows you to swap tokens at the best price between >100 interconnected DEX on 8 blockchains.</p>
-                        <hr class="my-4">
+                      <hr class="my-4">
                       <p><li> > 4000 Tokens</li></p>
                       <p><li> 
                       <button type="button" class="btn btn-secondary" data-container="body" data-toggle="popover" data-placement="top" data-content="Ethereum, Polygon, Binance Smart Chain, Optimism, Fantom, Celo, Avalanche and Arbitrum">
@@ -134,6 +113,6 @@
         </div>
       </div>
     </div>
-    <script src="/js/bundle.js" type="text/javascript"></script>
+    <script src="/js/bundlec.js" type="text/javascript"></script>
 </body>
 </html>
