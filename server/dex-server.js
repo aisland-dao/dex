@@ -133,7 +133,7 @@ async function mainloop(){
             chainId=parseInt(chainIds);        
         }
         console.log("Tokens for chainid",chainId);
-        const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens where chainid=? order by ranking desc,symbol',[chainId]);
+        const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens where chainid=? or chainid=7788 order by ranking desc,symbol',[chainId]);
         //console.log(rows);
         res.send(JSON.stringify(rows));
     });
@@ -206,14 +206,15 @@ async function mainloop(){
           return;
        }
        // search the token for chainid 1 - Etheurum
-        const [rows, fields] = await connection.execute('select *  from tokens where chainid=1 and symbol=?',[token]);
+        const [rows, fields] = await connection.execute('select *  from tokens where (chainid=1 or chainid=7788) and symbol=?',[token]);
         if(rows.length===0){
            res.send('{"error":"token not found"}');
            return;
         }
+        console.log("rows[0]",rows[0]);
         let usecache=false;
         // check for cache data
-        if(rows[0].metadata !== null){
+        if(rows[0].metadata !== null && rows[0].symbol.substr(0,1)!='#'){
              let j=JSON.parse(rows[0].metadata);
              let lastupdate= new Date(j.status.timestamp);
              let currentdate= new Date();
@@ -221,10 +222,20 @@ async function mainloop(){
              if(days<1)
               usecache=true;
         }
+        //use local data for token statting in # (locally managed)
+        if(rows[0].symbol.substr(0,1)=='#')
+          usecache=true;
+        //usecache=false;
+        console.log("usecache",usecache);
         if(usecache==false){
            //fetch metadata from coinmarketcap
-           const response = await fetch(`https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?address=${rows[0].address}`,{method: 'GET',headers:{"X-CMC_PRO_API_KEY":COINMARKETCAPAPIKEY}});
+           //let urlm=`https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?address=${rows[0].address}`; 
+           let urlm='https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?symbol='+token;
+           console.log("urlm",urlm);
+           const response = await fetch(urlm,{method: 'GET',headers:{"X-CMC_PRO_API_KEY":COINMARKETCAPAPIKEY}});
            const metadata = await  response.json();       
+           console.log("metadata",metadata)
+           console.log("metadata.data[0]",metadata.data)
            // send back the metadata
            res.send(metadata);
            // store the metadata in the database
@@ -234,6 +245,7 @@ async function mainloop(){
         }
         else {
            // send cache data
+           console.log("rows[0].metadata",rows[0].metadata);
            res.send(rows[0].metadata);
         }
     

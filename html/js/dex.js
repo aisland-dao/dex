@@ -108,7 +108,7 @@ search_token.addEventListener("input", filterTokens);
 
 // render connectkit button
 render_connectkit();
-// listen for change of the blockchain and reaload in casen
+// listen for change of the blockchain and reload in case
 if (typeof  window.ethereum !== "undefined")
   window.ethereum.on('chainChanged', (chainId) => window.location.reload());
 // popover call
@@ -233,7 +233,7 @@ function renderInterface(){
 
 }
 
-// funnction to get best price for swapping
+// function to get best price for swapping
 async  function  getPrice(){
   console.log("Getting Price");
   // Only fetch price if from token, to token, and from token amount have been filled in 
@@ -275,7 +275,7 @@ async  function  getPrice(){
   //get best gas fees on Po
   let gp= await getBestGasprice()
   let bestgasprice=swapPriceJSON.estimatedGas*gp;
-  console.log("bestgasprice",bestgasprice);
+  //console.log("bestgasprice",bestgasprice);
   let note='';
   // add note for Polygon if not already on it
   if(CHAINID!=0x89 && bestgasprice<gasusd){
@@ -459,14 +459,17 @@ async function render_tokensmetadata(tokens){
   if(tokens[i]=="To Token" || tokens[i]=="From Token")
     continue;
   // fetch metadata
-  let url = window.location.protocol + "//" + window.location.host+"/tokenmetadata";
-  let response = await fetch(url+'?token='+tokens[i]);
+  
+  let url = window.location.protocol + "//" + window.location.host+"/tokenmetadata"+'?token='+tokens[i].replace("#","%23");
+  console.log(url);
+  let response = await fetch(url);
   let md = await response.json();
   // check for valid metadata
-  if(typeof md.status ==='undefined')
+  if(typeof md.data ==='undefined')
    continue;
   // build a table with the metadata
-  let k=Object.values(md.data)[0];
+  let k=Object.values(md.data)[0][0];
+  console.log('k',k);
   c=c+'<table class="table table-striped-columns table-responsive-sm">' ;
   c=c+"<tr><td>Name</td><td>"+k.name+'&nbsp;&nbsp;<img src="'+k.logo+'" width="50"></td></tr>';  
   // add a space after the first 'and'
@@ -477,29 +480,41 @@ async function render_tokensmetadata(tokens){
    if(k.urls.website[0].length>0)
        c=c+'<a href="'+k.urls.website[0]+'"><img src="images/web.png"></a>';  
   }
-  if(typeof k.urls.twitter[0] != 'undefined'){
-   if(k.urls.twitter[0].length>0)
-       c=c+'&nbsp;<a href="'+k.urls.twitter[0]+'"><img src="images/twitter.png"></a>';  
+  if(typeof k.urls.twitter != 'undefined'){
+   if(typeof k.urls.twitter[0] != 'undefined'){
+    if(k.urls.twitter[0].length>0)
+        c=c+'&nbsp;<a href="'+k.urls.twitter[0]+'"><img src="images/twitter.png"></a>';  
+   }
   }
-  if(typeof k.urls.facebook[0] != 'undefined'){
-   if(k.urls.facebook[0].length>0)
-       c=c+'&nbsp;<a href="'+k.urls.facebook[0]+'"><img src="images/facebook.png"></a>';  
+  if(typeof k.urls.facebook!= 'undefined'){
+   if(typeof k.urls.facebook[0] != 'undefined'){
+    if(k.urls.facebook[0].length>0)
+        c=c+'&nbsp;<a href="'+k.urls.facebook[0]+'"><img src="images/facebook.png"></a>';  
+   }
   }  
-  if(typeof k.urls.reddit[0] != 'undefined'){
-   if(k.urls.reddit[0].length>0)
-       c=c+'&nbsp;<a href="'+k.urls.reddit[0]+'"><img src="images/reddit.png"></a>';  
+  if(typeof k.urls.reddit != 'undefined'){
+   if(typeof k.urls.reddit[0] != 'undefined'){
+    if(k.urls.reddit[0].length>0)
+        c=c+'&nbsp;<a href="'+k.urls.reddit[0]+'"><img src="images/reddit.png"></a>';  
+   }
   }
-  if(typeof k.urls.source_code[0] != 'undefined'){
-   if(k.urls.source_code[0].length>0)
-       c=c+'&nbsp;<a href="'+k.urls.source_code[0]+'"><img src="images/github.png"></a>';  
+  if(typeof k.urls.source_code != 'undefined'){
+   if(typeof k.urls.source_code[0] != 'undefined'){
+    if(k.urls.source_code[0].length>0)
+        c=c+'&nbsp;<a href="'+k.urls.source_code[0]+'"><img src="images/github.png"></a>';  
+    }
   }
-  if(typeof k.urls.chat[0] != 'undefined'){
-   if(k.urls.chat[0].length>0)
-       c=c+'&nbsp;<a href="'+k.urls.chat[0]+'"><img src="images/chat.png"></a>';  
+  if(typeof k.urls.chat != 'undefined'){
+   if(typeof k.urls.chat[0] != 'undefined'){
+    if(k.urls.chat[0].length>0)
+        c=c+'&nbsp;<a href="'+k.urls.chat[0]+'"><img src="images/chat.png"></a>';  
+   }
   }
-  if(typeof k.urls.explorer[0] != 'undefined'){
-   if(k.urls.explorer[0].length>0)
-       c=c+'&nbsp;<a href="'+k.urls.explorer[0]+'"><img src="images/explorer.png"></a>';  
+  if(typeof k.urls.explorer != 'undefined'){
+   if(typeof k.urls.explorer[0] != 'undefined'){
+    if(k.urls.explorer[0].length>0)
+        c=c+'&nbsp;<a href="'+k.urls.explorer[0]+'"><img src="images/explorer.png"></a>';  
+   }
   }
   //console.log(k);
   
