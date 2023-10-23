@@ -137,6 +137,27 @@ async function mainloop(){
         //console.log(rows);
         res.send(JSON.stringify(rows));
     });
+    // fetch internally listed tokens 
+    app.get('/internaltokens',async function (req, res) {
+        let chainIds=req.query.chainId;
+        let chainId=1;
+        if(typeof chainIds !== 'undefined'){
+            chainId=parseInt(chainIds);        
+        }
+        let token='';
+        if(typeof req.query.token!='undefined')
+          token=req.query.token;
+        console.log("Tokens for chainid",chainId," token",token);
+        let sql="select symbol,name,address,tokens.chainid,tokens.decimals,originallogouri as logouri ";
+        sql=sql+"from tokens inner join crosschainpairs ";
+        sql=sql+"where symbol=fromsymbol and "
+        sql=sql+"tokens.chainid=crosschainpairs.fromchainid  and tokens.chainid=? ";
+        sql=sql+"and tosymbol=? order by ranking desc,symbol ";
+
+        const [rows, fields] = await connection.execute(sql,[chainId,token]);
+        //console.log(rows);
+        res.send(JSON.stringify(rows));
+    });
     // fetch best gas price
     app.get('/bestgasprice',async function (req, res) {
         const [rows, fields] = await connection.execute('select *,gwei*usdrate/1000000000 as gasprice from gasstation order by gasprice desc');
