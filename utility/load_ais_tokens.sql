@@ -1,0 +1,23 @@
+delete from tokens where symbol='#AISC';
+insert into tokens set symbol='#AISC',
+name='Aisland Coin',
+decimals=18,
+platform='aisland',
+chainid=7788,
+address='native',
+originallogouri='https://dex.aisland.io/img/aisc.png',
+ranking=9999,
+metadata='{"data":{"AISC":[{"id":10000,"name":"Aisland Coin","description":"AISC is the native currency of Aisland blockchain. It is used to purchase any product and service from Aisland DAO. The exchange rate is fixed to 1 USD for 1 AISC.","logo":"https://dex.aisland.io/img/aisclogo.png","urls":{"website":["https://aisland.io"]}}]}}',
+dtupdate=now();
+
+delete from tokens where symbol='#AISG';
+insert into tokens set symbol='#AISG',
+name='Aisland Governance Token',
+decimals=18,
+platform='aisland',
+chainid=7788,
+address='substratenative',
+originallogouri='https://dex.aisland.io/img/aisg.png',
+ranking=9998,
+metadata='{"data":{"AISG":[{"id":10000,"name":"Aisland Governance","description":"AISG is the governance token of the Aisland DAO. It allows to vote directly on all the matters of the DAO. The exchange rate is currently 10 USD per token.","logo":"https://dex.aisland.io/img/aisglogo.png","urls":{"website":["https://aisland.io"]}}]}}',
+dtupdate=now();
