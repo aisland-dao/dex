@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#"><img src="logo_dex.png"></a>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
@@ -36,10 +37,17 @@
           <li class="nav-item">
             <a class="btn btn-outline-primary my-2 my-sm-0" href="https://news.aisland.io" role="button">News</a>
           </li>
-      </nav>
-      <div class ="container">
+        </nav>
+
         <div class="row">
-            <div class="col col-md-6 offset-md-3" id="window">
+          <div class="col col-md-8 offset-md-2 mx-auto pt-2">
+            <div class="alert alert-info" role="alert">
+              Winner of the <a href="https://dorahacks.io/hackathon/decreasing-frictions-in-defi/results" target="_blank">Hackaton "Decreasing friction in Defi" - July 2023</a>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col col-md-8 offset-md-2" id="window">
                 <div id='blockchain'><h4>Swap</h4></div>
                 <div id="form">
                     <div class="swapbox">
@@ -68,6 +76,9 @@
                         </div>
                          <div class="swapbox_select">
                             <input disabled class="number form-control" placeholder="amount" id="to_amount">
+                            <div id="recipientdiv" class="pt-1" hidden>
+                            <input type="text" class="form-control" placeholder="Recipient Address" id="recipientaddress" >
+                            </div>
                         </div>
                     </div>  
                     <div class="row g-3 align-items-center">

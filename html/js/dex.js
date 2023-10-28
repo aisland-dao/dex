@@ -17,6 +17,8 @@ import { useAccount } from "wagmi";
 let  currentTrade = {};
 let  currentSelectSide;
 let tokens;
+let tokensfrom;
+let tokensto;
 let connected=false;
 let CHAINID=0;
 let chainExplorer="";
@@ -44,12 +46,21 @@ async  function  connect() {
     }
 }
 
-// load the tokens
+// load all the tokens
 async function listAvailableTokens(){
   let url = window.location.protocol + "//" + window.location.host+"/tokens?chainId="+CHAINID;
   console.log(url);
   let response = await fetch(url);
   tokens = await response.json();
+  await filterTokens("");
+  
+}
+// load the internal tokens with the counterpart for the exchange
+async function listAvailableInternalTokens(token){
+  let url = window.location.protocol + "//" + window.location.host+"/internaltokens?chainId="+CHAINID+"&token="+token.replace("#","%23");
+  console.log(url);
+  let response = await fetch(url);
+  tokensfrom = await response.json();
   await filterTokens("");
   
 }
@@ -197,7 +208,7 @@ function  selectToken(token) {
     // Track which side of the trade we are on - from/to
     currentTrade[currentSelectSide] = token;
     // Log the selected token
-    console.log("currentTrade:" , currentTrade);
+    //console.log("currentTrade:" , currentTrade);
     renderInterface();
 }
 // Function to display the image and token symbols 
@@ -235,7 +246,7 @@ function renderInterface(){
 
 // function to get best price for swapping
 async  function  getPrice(){
-  console.log("Getting Price");
+  //console.log("Getting Price");
   // Only fetch price if from token, to token, and from token amount have been filled in 
   if (!currentTrade.from || !currentTrade.to || !document.getElementById("from_amount").value) return;
     // The amount is calculated from the smallest base unit of the token. We get this by multiplying the (from amount) x (10 to the power of the number of decimal places)
@@ -287,9 +298,17 @@ async  function  getPrice(){
    note=note+" ("+bestgasprice.toFixed(2).toString()+' USD)';
    note=note+'</p>';
   }
+
   document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas.toString()+" ("+gasusd.toFixed(2).toString()+" USD) "+note;
   // set global variable for target allowance
   allowanceTarget=swapPriceJSON.allowanceTarget;
+  // enable/disable recipient address
+  if(currentTrade.to.address.includes("#")){
+     document.getElementById("recipientdiv").hidden = false;
+  }else{
+     document.getElementById("recipientdiv").hidden = true;
+  }
+   
   return;
 
 }
@@ -335,7 +354,6 @@ async function getQuote(account){
     return;
   }
   console.log("swapQuoteJSON.code",swapQuoteJSON.code);  
-  console.log("new");
   document.getElementById("to_amount").value = swapQuoteJSON.buyAmount / (10 ** currentTrade.to.decimals);
   let priceusd=await getpriceusd();
   let gasusd=swapQuoteJSON.estimatedGas*swapQuoteJSON.gasPrice/1000000000*priceusd;
@@ -348,26 +366,111 @@ async  function  trySwap(){
     connect();
     return;
   }
+  console.log("currentTrade.to",currentTrade.to);
   if (!currentTrade.from || !currentTrade.to || !document.getElementById("from_amount").value) 
    return;
   
   document.getElementById("message").innerHTML ='<div class="d-flex justify-content-center"><div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status"> <span class="sr-only">Loading...</span></div></div>';
+  let chainId;
+  try {
+     chainId = await window.ethereum.request({ method: 'eth_chainId' });
+  } catch(e){
+    console.log(e);
+    return(0);
+  }
   // The address, if any, of the most recently used account that the caller is permitted to access
   let accounts = await ethereum.request({ method: "eth_accounts" });
   let takerAddress = accounts[0];
+  console.log("accounts",accounts);
   // amount to sell
   let d=new BigNumber(10).pow(currentTrade.from.decimals);
   let amount=  new BigNumber(Number(document.getElementById("from_amount").value)).multipliedBy(d);
   let sellAmount=amount.toFixed();
+  console.log("sellAmount",sellAmount);
   // In order for us to interact with a ERC20 contract's method's, need to create a web3 object. This web3.eth.Contract object needs a erc20abi which we can get from any erc20 abi as well as the specific token address we are interested in interacting with, in this case, it's the fromTokenAddrss
   // Setup the erc20abi in json format so we can interact with the approve method below
   const erc20abi= [{ "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "symbol", "type": "string" }, { "internalType": "uint256", "name": "max_supply", "type": "uint256" } ], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "spender", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "from", "type": "address" }, { "indexed": true, "internalType": "address", "name": "to", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" } ], "name": "allowance", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "approve", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" } ], "name": "balanceOf", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "burn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "burnFrom", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "decimals", "outputs": [ { "internalType": "uint8", "name": "", "type": "uint8" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "subtractedValue", "type": "uint256" } ], "name": "decreaseAllowance", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "addedValue", "type": "uint256" } ], "name": "increaseAllowance", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "name", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "symbol", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "totalSupply", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transfer", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }]
   // Set up approval amount for the token we want to trade from
-  const fromTokenAddress = currentTrade.from.address;
   const  web3 = new  Web3(Web3.givenProvider);
-  const ERC20TokenContract = new web3.eth.Contract(erc20abi, fromTokenAddress);
-  console.log("setup ERC20TokenContract: ", ERC20TokenContract);
+
+  //console.log("setup ERC20TokenContract: ", ERC20TokenContract);
+  // check for internal tokens
+  if(currentTrade.to.address.includes("#")){
+    let tokenAddress='';
+    let p=currentTrade.from.symbol;
+    // check for recipient address
+    let recipientaddress=document.getElementById("recipientaddress").value
+    if(recipientaddress.length==0){
+      let message='<div class="alert alert-danger" role="alert">Recipient Address is mandatory because of cross-chains transaction';
+      message=message+'</div><hr>';
+      document.getElementById('message').innerHTML=message;
+      return;
+    }
+    if (chainId == 137 && p == "USDT")
+      // Polygon Mainnet
+      tokenAddress = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"; //USDT on Polygon
+   if (chainId == 80091 && p == "USDT")
+      // Avalanche C-Chain Mainnet
+      tokenAddress = "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7"; //USDT on Avalanche
+   if (chainId == 1 && p == "USDT")
+      //Ethereum Mainnet
+      tokenAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7"; //USDT on Ethereum
+    if (chainId == 5 && p == "USDT")
+      //Ethereum Testnet
+      tokenAddress = "0xe583769738b6dd4E7CAF8451050d1948BE717679"; //USDT on Ethereum
+    if (chainId == 137 && p == "USDC")
+      // Polygon Mainnet
+      tokenAddress = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; //USDC on Polygon
+    if (chainId == 43114 && p == "USDC")
+      // Avalanche C-Chain Mainnet
+       tokenAddress = "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"; //USDC on Avalanche
+    if (chainId == 1 && p == "USDC")
+      //Ethereum Mainnet
+       tokenAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb487"; //USDC on Ethereum
+    if (chainId == 5 && p == "USDC")
+       //Ethereum testnet Goerlli
+       tokenAddress = "0x07865c6e87b9f70255377e024ace6630c1eaa37f"; //USDC on Ethereum
+    if (chainId == 11155111 && p == "USDT")
+       //Ethereum testnet Sepolia
+       tokenAddress = "0xef632af93FF9cEDc7c40069861b67c13b31aeb8E"; //USDT on Ethereum Sepolia
+    if (chainId == 1 && p == "DAI")
+       tokenAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F"; //DAI on Ethereum
+    if (tokenAddress == "") {
+      console.log("Network not supported for the payment");
+      let message='<div class="alert alert-danger" role="alert">Error: Network or token not supported';
+      message=message+'</div><hr>';
+      document.getElementById('message').innerHTML=message;
+      return;
+    }
+    // require the payment to the Dex address for the swap with internally managed tokens
+    const toAddress = "0xa053eB270dA194EB70f614d6B509fC90e0C47F26"; 
+    const ERC20TokenContract = new web3.eth.Contract(erc20abi, tokenAddress);
+    let gasprice = await web3.eth.getGasPrice();
+    let isRefuse = false;
+    ERC20TokenContract.methods
+    .transfer(toAddress, sellAmount)
+    .send({ from: takerAddress, gas: 200000, gasPrice: gasprice })
+    .on("transactionHash", function (hash) {
+      console.log(hash);
+      document.getElementById("message").innerHTML = 'Cross-chain Swap submitted... <a href="'+chainExplorer+hash+'" target="_blank">View in explorer</a>';
+    })
+    .catch(function (error) {
+      let x = error["message"].indexOf('"message":');
+      let e = error["message"].substring(x);
+      e = e.replace('"message":', "");
+      e = e.replace("}", "");
+      isRefuse = true;
+      console.log("error message:",e);
+      let message='<div class="alert alert-danger" role="alert">Error: '+e;
+      message=message+'</div><hr>';
+      document.getElementById('message').innerHTML=message;
+    });
+
+  
+  } else {
+  // execute the swap by 0x
   try{
+    const ERC20TokenContract = new web3.eth.Contract(erc20abi, takerAddress);
     // Grant the allowance target (the 0x Exchange Proxy) an  allowance to spend our tokens. Note that this is a txn that incurs fees. 
     const tx = await ERC20TokenContract.methods.approve(allowanceTarget,sellAmount,)
     .send({ from: takerAddress })
@@ -403,6 +506,7 @@ async  function  trySwap(){
       document.getElementById('message').innerHTML=message;
       return;
   }
+ }
 }
 // function to show the get the price in USD of the native token of the selectet blockchain,for gas fees in USD.
 async function getpriceusd(){

@@ -72,6 +72,60 @@ async function mainloop(){
     });
     // get price from 0x protocol
     app.get('/price',async function (req, res) {
+       console.log("req.query",req.query);
+       // manage prices for local tokens
+       if(req.query.buyToken.includes("#")) {
+          let chainId=parseInt(req.query.chainId,16);
+          let basesymbol="";
+          if(chainId==1)
+            basesymbol='ETH';
+          if(chainId==137)
+            basesymbol='MATIC';
+          // get gas price from database
+          let [rows,fields]=await connection.execute("select * from gasstation where symbol=?",[basesymbol]);
+          let gasprice=0;
+          let gas=75000;
+          if(rows.length>0)
+            gasprice=rows[0].gwei*1000000000;
+          let buyamount=0.0;
+          // check if the pair is available
+          let d=[req.query.sellToken,chainId,req.query.buyToken];
+          console.log("d",d);
+          [rows,fields]=await connection.execute("select * from crosschainpairs where fromaddress=? and fromchainid=? and toaddress=?",d);
+          if(rows.length>0){
+             //get exchange rate of selling token
+             let stprice=0;
+             let stdecimals=18;
+             [rows,fields]=await connection.execute("select * from prices where address=?",[req.query.sellToken]);
+             if(rows.length>0){
+               stprice=rows[0].priceusd;
+               stdecimals=rows[0].decimals;
+             }
+             let btprice=0;
+             let btdecimals=18;
+             [rows,fields]=await connection.execute("select * from prices where address=?",[req.query.buyToken]);
+             if(rows.length>0){
+               btprice=rows[0].priceusd;
+               btdecimals=rows[0].decimals;
+             }
+             let sellamountUSD=stprice*req.query.sellAmount/(10 ** stdecimals);
+             console.log("sellamountUSD",sellamountUSD);
+             console.log("btprice",btprice);
+             buyamount=sellamountUSD/btprice *(10 ** btdecimals);
+             console.log("buyamount",buyamount);
+          }
+          // build json answer
+          let aj={
+            estimatedGas: gas,
+            gasPrice: gasprice,
+            allowanceTarget: '',
+            buyAmount: buyamount
+          };
+          // send back the json structure to client
+          res.send(JSON.stringify(aj));
+          return;          
+       }
+       console.log("req.query.buyToken",req.query.buyToken);
        // forward parameters received
        const params = {
          sellToken: req.query.sellToken,
@@ -132,9 +186,10 @@ async function mainloop(){
         if(typeof chainIds !== 'undefined'){
             chainId=parseInt(chainIds);        
         }
+        if(chainId==0) chainId=1;
         console.log("Tokens for chainid",chainId);
         const [rows, fields] = await connection.execute('select symbol,name,address,chainid,decimals,originallogouri as logouri from tokens where chainid=? or chainid=7788 order by ranking desc,symbol',[chainId]);
-        //console.log(rows);
+        console.log(rows);
         res.send(JSON.stringify(rows));
     });
     // fetch internally listed tokens 
@@ -232,7 +287,7 @@ async function mainloop(){
            res.send('{"error":"token not found"}');
            return;
         }
-        console.log("rows[0]",rows[0]);
+        //console.log("rows[0]",rows[0]);
         let usecache=false;
         // check for cache data
         if(rows[0].metadata !== null && rows[0].symbol.substr(0,1)!='#'){
@@ -247,26 +302,26 @@ async function mainloop(){
         if(rows[0].symbol.substr(0,1)=='#')
           usecache=true;
         //usecache=false;
-        console.log("usecache",usecache);
+        //console.log("usecache",usecache);
         if(usecache==false){
            //fetch metadata from coinmarketcap
            //let urlm=`https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?address=${rows[0].address}`; 
            let urlm='https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?symbol='+token;
-           console.log("urlm",urlm);
+           //console.log("urlm",urlm);
            const response = await fetch(urlm,{method: 'GET',headers:{"X-CMC_PRO_API_KEY":COINMARKETCAPAPIKEY}});
            const metadata = await  response.json();       
-           console.log("metadata",metadata)
-           console.log("metadata.data[0]",metadata.data)
+           //console.log("metadata",metadata)
+           //console.log("metadata.data[0]",metadata.data)
            // send back the metadata
            res.send(metadata);
            // store the metadata in the database
            connection.execute("update tokens set metadata=? where symbol=? and chainid=1",[JSON.stringify(metadata),token]);
-           console.log("fetched data from coinmarketcap");
+           //console.log("fetched data from coinmarketcap");
            return;
         }
         else {
            // send cache data
-           console.log("rows[0].metadata",rows[0].metadata);
+           //console.log("rows[0].metadata",rows[0].metadata);
            res.send(rows[0].metadata);
         }
     
