@@ -219,6 +219,64 @@ async function mainloop(){
         //console.log(rows);
         res.send(JSON.stringify(rows[0]));
     });
+    
+    // store a payment for internal tokens
+    app.get('/storepayment',async function (req, res) {
+        // check parameters
+        const senderaddress=req.query.senderaddress;
+        if(typeof senderaddress === 'undefined'){
+          res.send('{"answer":"KO","message":"senderaddress is missing"}');
+          return;
+        }
+        const recipientaddress=req.query.recipientaddress;
+        if(typeof recipientaddress === 'undefined'){
+          res.send('{"answer":"KO","message":"recipientaddress is missing"}');
+          return;
+        }
+        const fromsymbol=req.query.fromsymbol;
+        if(typeof fromsymbol === 'undefined'){
+          res.send('{"answer":"KO","message":"fromsymbol is missing"}');
+          return;
+        }
+        const tosymbol=req.query.tosymbol;
+        if(typeof tosymbol === 'undefined'){
+          res.send('{"answer":"KO","message":"tosymbol is missing"}');
+          return;
+        }
+        const fromaddress=req.query.fromaddress;
+        if(typeof fromaddress === 'undefined'){
+          res.send('{"answer":"KO","message":"fromaddress is missing"}');
+          return;
+        }
+        const toaddress=req.query.toaddress;
+        if(typeof toaddress === 'undefined'){
+          res.send('{"answer":"KO","message":"toaddress is missing"}');
+          return;
+        }
+        const sellamount=req.query.sellamount;
+        if(typeof sellamount === 'undefined'){
+          res.send('{"answer":"KO","message":"sellamount is missing"}');
+          return;
+        }
+        const buyamount=req.query.buyamount;
+        if(typeof buyamount === 'undefined'){
+          res.send('{"answer":"KO","message":"buyamount is missing"}');
+          return;
+        }
+        // check for duplicated records
+        let d=[senderaddress,recipientaddress,fromaddress,toaddress,sellamount,buyamount];
+        const [rows,fields]=await connection.execute("select * from crosschainpayments where senderaddress=? and recipientaddress!=? and fromaddress=? and toaddress=? and sellamount=? and buyamount=? and dtupdate>DATE_SUB(NOW(), INTERVAL 1 HOUR)",d);
+        if(rows.length>0){
+          res.send('{"answer":"KO","message":"order already present, the recipient cannot be changed for 1 hour. You can change the amount for a new order with different recipient"}');
+          return;
+        }
+        // insert record
+        d=[senderaddress,recipientaddress,fromsymbol,fromaddress,sellamount,tosymbol,toaddress,buyamount];
+        await connection.execute("insert into crosschainpayments set senderaddress=?,recipientaddress=?,fromsymbol=?,fromaddress=?,sellamount=?,tosymbol=?,toaddress=?,buyamount=?,dtupdate=now()",d);
+        res.send('{"answer":"OK","message":"payment stored"}');
+        return
+    });
+    
     // get token price in USD (for gas fees only, so only a few tokens are supported)
     app.get('/priceusd',async function (req, res) {
        let token=req.query.token;

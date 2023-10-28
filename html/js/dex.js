@@ -399,7 +399,7 @@ async  function  trySwap(){
     let tokenAddress='';
     let p=currentTrade.from.symbol;
     // check for recipient address
-    let recipientaddress=document.getElementById("recipientaddress").value
+    let recipientaddress=document.getElementById("recipientaddress").value;
     if(recipientaddress.length==0){
       let message='<div class="alert alert-danger" role="alert">Recipient Address is mandatory because of cross-chains transaction';
       message=message+'</div><hr>';
@@ -438,6 +438,27 @@ async  function  trySwap(){
     if (tokenAddress == "") {
       console.log("Network not supported for the payment");
       let message='<div class="alert alert-danger" role="alert">Error: Network or token not supported';
+      message=message+'</div><hr>';
+      document.getElementById('message').innerHTML=message;
+      return;
+    }
+    // store the payment request
+    const params = {
+     senderaddress: takerAddress,
+     recipientaddress: recipientaddress,
+     fromsymbol: currentTrade.from.symbol,
+     fromaddress: currentTrade.from.address,
+     sellAmount,sellamount: sellAmount,
+     tosymbol: currentTrade.to.symbol,
+     toaddress: currentTrade.to.address,
+     buyamount: document.getElementById("to_amount").value
+    };
+    let url = window.location.protocol + "//" + window.location.host+"/storepayment";
+    const response = await fetch(url+`?${qs.stringify(params)}`);
+    let aj = await  response.json();
+    // check for answer
+    if(aj.answer=="KO"){
+      let message='<div class="alert alert-danger" role="alert">Error:'+aj.message;
       message=message+'</div><hr>';
       document.getElementById('message').innerHTML=message;
       return;
