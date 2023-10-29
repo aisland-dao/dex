@@ -1,7 +1,7 @@
 {
   "name": "dex",
   "version": "1.0.0",
-  "description": "Crosschain Decentralised Exchange",
+  "description": "Crossochain Decentralised Exchange",
   "main": "dex-server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@polkadot/api": "^10.10.1",
     "bignumber.js": "^9.1.1",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
