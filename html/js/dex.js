@@ -398,6 +398,7 @@ async  function  trySwap(){
   if(currentTrade.to.address.includes("#")){
     let tokenAddress='';
     let p=currentTrade.from.symbol;
+    console.log("Internal token");
     // check for recipient address
     let recipientaddress=document.getElementById("recipientaddress").value;
     if(recipientaddress.length==0){
@@ -490,8 +491,10 @@ async  function  trySwap(){
   
   } else {
   // execute the swap by 0x
+  console.log("Call the allowance for swapping");
+  const fromTokenAddress = currentTrade.from.address;
   try{
-    const ERC20TokenContract = new web3.eth.Contract(erc20abi, takerAddress);
+    const ERC20TokenContract = new web3.eth.Contract(erc20abi, fromTokenAddress);
     // Grant the allowance target (the 0x Exchange Proxy) an  allowance to spend our tokens. Note that this is a txn that incurs fees. 
     const tx = await ERC20TokenContract.methods.approve(allowanceTarget,sellAmount,)
     .send({ from: takerAddress })
@@ -509,7 +512,7 @@ async  function  trySwap(){
   console.log("takerAddress: ", takerAddress);
   // Pass this as the account param into getQuote() we built out earlier. This will return a JSON object trade order. 
   const  swapQuoteJSON = await  getQuote(takerAddress);
-  //console.log(swapQuoteJSON);
+  console.log(swapQuoteJSON);
   //console.log("fromTokenAddress",fromTokenAddress);
   //console.log("currentTrade",currentTrade);
 
